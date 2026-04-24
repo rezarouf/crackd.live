@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Crackd.live — UI Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: #0D0F14; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0D0F14; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Shared data and constants -->
+<script type="text/babel">
+const GAMES = [
+  { id:'wordle', name:'Wordle', icon:'🔤', type:'word', desc:'Guess the 5-letter word in 6 tries', xp:100, difficulty:'Medium', done:true },
+  { id:'connections', name:'Connections', icon:'🔗', type:'word', desc:'Group 16 words into 4 categories', xp:120, difficulty:'Hard', done:true },
+  { id:'nerdle', name:'Nerdle', icon:'🔢', type:'word', desc:'Guess the equation in 6 tries', xp:130, difficulty:'Hard', done:false },
+  { id:'cryptogram', name:'Cryptogram', icon:'🔐', type:'word', desc:'Decode the encrypted message', xp:150, difficulty:'Expert', done:false },
+  { id:'sudoku', name:'Sudoku', icon:'🔳', type:'word', desc:'Fill the 9×9 grid with digits', xp:110, difficulty:'Medium', done:false },
+  { id:'screw', name:'Screw Puzzle', icon:'🔩', type:'visual', desc:'Unscrew and free the bolts by color', xp:90, difficulty:'Easy', done:true },
+  { id:'pin', name:'Pin Pull', icon:'📌', type:'visual', desc:'Pull pins in the right order', xp:80, difficulty:'Easy', done:false },
+  { id:'rope', name:'Rope Untangle', icon:'🪢', type:'visual', desc:'Untangle the knotted ropes', xp:95, difficulty:'Medium', done:false },
+  { id:'wood', name:'Wood Block', icon:'🟫', type:'visual', desc:'Slide blocks to clear the board', xp:100, difficulty:'Medium', done:false },
+  { id:'nuts', name:'Nuts & Bolts', icon:'⚙️', type:'visual', desc:'Match and tighten nut-bolt pairs', xp:85, difficulty:'Easy', done:false },
+];
+
+const ALL_PLAYERS = [
+  { rank:1, name:'xCipherKing', country:'🇺🇸', xp:9840, streak:94, winRate:96, speed:'1:12', avatar:'CK', color:'#F5A623' },
+  { rank:2, name:'PuzzlrPro', country:'🇬🇧', xp:9210, streak:67, winRate:91, speed:'1:28', avatar:'PP', color:'#8B95A1' },
+  { rank:3, name:'GridMaster9', country:'🇩🇪', xp:8755, streak:51, winRate:88, speed:'1:44', avatar:'GM', color:'#CD7F32' },
+  { rank:4, name:'SolveQueen', country:'🇫🇷', xp:8100, streak:44, winRate:85, speed:'1:51', avatar:'SQ', color:'#4A9EFF' },
+  { rank:5, name:'CrackdDaily', country:'🇨🇦', xp:7890, streak:38, winRate:82, speed:'2:02', avatar:'CD', color:'#4A9EFF' },
+  { rank:6, name:'WordWitch', country:'🇦🇺', xp:7440, streak:29, winRate:79, speed:'2:10', avatar:'WW', color:'#4A9EFF' },
+  { rank:7, name:'NumberNinja', country:'🇯🇵', xp:7210, streak:22, winRate:76, speed:'2:18', avatar:'NN', color:'#4A9EFF' },
+  { rank:8, name:'TileBreaker', country:'🇧🇷', xp:6980, streak:19, winRate:74, speed:'2:25', avatar:'TB', color:'#4A9EFF' },
+  { rank:9, name:'CryptoKing', country:'🇮🇳', xp:6710, streak:15, winRate:71, speed:'2:33', avatar:'CK', color:'#4A9EFF' },
+  { rank:10, name:'PuzzleGod', country:'🇰🇷', xp:6490, streak:11, winRate:69, speed:'2:41', avatar:'PG', color:'#4A9EFF' },
+  { rank:247, name:'You', country:'🇺🇸', xp:4200, streak:23, winRate:61, speed:'3:14', avatar:'ME', color:'#F5A623', isMe: true },
+];
+
+const diffColor = { Easy:'#22C55E', Medium:'#F5A623', Hard:'#4A9EFF', Expert:'#EF4444' };
+
+const TILE_COLORS = {
+  empty: { bg:'transparent', border:'rgba(255,255,255,0.1)', color:'#F0F0F0' },
+  filled: { bg:'rgba(255,255,255,0.08)', border:'rgba(255,255,255,0.25)', color:'#F0F0F0' },
+  correct: { bg:'#F5A623', border:'#F5A623', color:'#0D0F14' },
+  present: { bg:'#4A9EFF', border:'#4A9EFF', color:'#fff' },
+  absent: { bg:'#2A2F3A', border:'#2A2F3A', color:'#8B95A1' },
+};
+
+Object.assign(window, { GAMES, ALL_PLAYERS, diffColor, TILE_COLORS });
+</script>
+
+<!-- Components -->
+<script type="text/babel" src="components/Nav.jsx"></script>
+<script type="text/babel" src="pages/Home.jsx"></script>
+<script type="text/babel" src="pages/Games.jsx"></script>
+<script type="text/babel" src="pages/Wordle.jsx"></script>
+<script type="text/babel" src="pages/ScrewPuzzle.jsx"></script>
+<script type="text/babel" src="pages/Leaderboard.jsx"></script>
+<script type="text/babel" src="pages/Profile.jsx"></script>
+<script type="text/babel" src="pages/Brand.jsx"></script>
+<script type="text/babel" src="pages/Mobile.jsx"></script>
+
+<!-- App shell -->
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#F5A623",
+  "bgColor": "#0D0F14",
+  "surfaceColor": "#161B25",
+  "blueAccent": "#4A9EFF",
+  "roundness": 12
+}/*EDITMODE-END*/;
+
+const PAGE_LABELS = {
+  home: 'Homepage',
+  games: 'Games Lobby',
+  wordle: 'Wordle In-Game',
+  screw: 'Screw Puzzle',
+  leaderboard: 'Leaderboard',
+  profile: 'User Profile',
+  brand: 'Brand Kit',
+  mobile: 'Mobile Screens',
+};
+
+function App() {
+  const [page, setPage] = React.useState(() => localStorage.getItem('crackd_page') || 'home');
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [showTweaks, setShowTweaks] = React.useState(false);
+
+  React.useEffect(() => {
+    localStorage.setItem('crackd_page', page);
+    window.scrollTo(0, 0);
+  }, [page]);
+
+  // Tweaks protocol
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setShowTweaks(true);
+      if (e.data?.type === '__deactivate_edit_mode') setShowTweaks(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const updateTweak = (key, val) => {
+    const next = { ...tweaks, [key]: val };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: val } }, '*');
+  };
+
+  const navPage = (id) => { setPage(id); };
+
+  const pages = [
+    { id:'home', label:'Homepage' },
+    { id:'games', label:'Games Lobby' },
+    { id:'wordle', label:'Wordle' },
+    { id:'screw', label:'Screw Puzzle' },
+    { id:'leaderboard', label:'Leaderboard' },
+    { id:'profile', label:'Profile' },
+    { id:'brand', label:'Brand Kit' },
+    { id:'mobile', label:'Mobile Screens' },
+  ];
+
+  return (
+    <div>
+      {/* Page switcher pill — always visible */}
+      <div style={{
+        position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 9000, display: 'flex', gap: 4, background: 'rgba(13,15,20,0.92)',
+        backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)',
+        borderRadius: 50, padding: 6, boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+      }}>
+        {pages.map(p => (
+          <button key={p.id} onClick={() => navPage(p.id)} style={{
+            background: page === p.id ? '#F5A623' : 'transparent',
+            border: 'none', color: page === p.id ? '#0D0F14' : '#8B95A1',
+            fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 12,
+            padding: '8px 14px', borderRadius: 40, cursor: 'pointer',
+            whiteSpace: 'nowrap', transition: 'all 0.2s',
+          }}>{p.label}</button>
+        ))}
+      </div>
+
+      {/* Tweaks panel */}
+      {showTweaks && (
+        <div style={{
+          position: 'fixed', bottom: 84, right: 20, zIndex: 9001,
+          background: '#161B25', border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 16, padding: 24, width: 260,
+          boxShadow: '0 16px 60px rgba(0,0,0,0.6)',
+          fontFamily: 'Inter, sans-serif', color: '#F0F0F0',
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
+            Tweaks <span style={{ fontSize: 10, color: '#8B95A1', fontWeight: 500, alignSelf: 'center' }}>Live preview</span>
+          </div>
+          {[
+            { key: 'accentColor', label: 'Accent Color', type: 'color' },
+            { key: 'bgColor', label: 'Background', type: 'color' },
+            { key: 'surfaceColor', label: 'Surface', type: 'color' },
+            { key: 'blueAccent', label: 'Blue Accent', type: 'color' },
+            { key: 'roundness', label: 'Border Radius', type: 'range', min: 0, max: 24 },
+          ].map(t => (
+            <div key={t.key} style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: '#8B95A1', fontWeight: 600, marginBottom: 6 }}>{t.label}</div>
+              {t.type === 'color'
+                ? <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <input type="color" value={tweaks[t.key]} onChange={e => updateTweak(t.key, e.target.value)} style={{ width: 36, height: 28, border: 'none', borderRadius: 6, cursor: 'pointer', background: 'none' }}/>
+                    <span style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: '#8B95A1' }}>{tweaks[t.key]}</span>
+                  </div>
+                : <div>
+                    <input type="range" min={t.min} max={t.max} value={tweaks[t.key]} onChange={e => updateTweak(t.key, +e.target.value)} style={{ width: '100%', accentColor: '#F5A623' }}/>
+                    <span style={{ fontSize: 12, color: '#8B95A1' }}>{tweaks[t.key]}px</span>
+                  </div>
+              }
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Nav (all pages except game screens) */}
+      {!['wordle','screw'].includes(page) && <Nav currentPage={page} setPage={navPage} />}
+
+      {/* Page render */}
+      {page === 'home' && <HomePage setPage={navPage} />}
+      {page === 'games' && <GamesPage setPage={navPage} />}
+      {page === 'wordle' && <WordlePage setPage={navPage} />}
+      {page === 'screw' && <ScrewPuzzlePage setPage={navPage} />}
+      {page === 'leaderboard' && <LeaderboardPage setPage={navPage} />}
+      {page === 'profile' && <ProfilePage setPage={navPage} />}
+      {page === 'brand' && <BrandPage />}
+      {page === 'mobile' && <MobilePage />}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
