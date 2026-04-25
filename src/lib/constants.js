@@ -75,6 +75,7 @@ export const GAMES_META = [
   { id: 'merge',            name: 'Merge Tiles',     icon: '🔷', type: 'visual', route: '/games/merge',            xp: 110, difficulty: 'Medium', desc: 'Slide and merge matching tiles to score big' },
   { id: 'emojiphrase',      name: 'Emoji Phrase',    icon: '🤔', type: 'word',   route: '/games/emojiphrase',      xp:  80, difficulty: 'Easy',   desc: 'Decode the phrase hidden in emoji clues' },
   { id: 'twentyfortyeight', name: '2048 Twist',      icon: '🎯', type: 'visual', route: '/games/2048',             xp: 160, difficulty: 'Expert', desc: 'Reach 2048 — but watch out for blocker tiles' },
+  { id: 'logoguess',        name: 'Logo Rush',       icon: '🏷️', type: 'visual', route: '/games/logoguess',        xp: 100, difficulty: 'Medium', desc: 'Guess the brand from its logo' },
 ];
 
 export const FULL_HOUSE_BONUS = 500;

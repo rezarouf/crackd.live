@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Type, Grid3X3, Hash, Lock, Grid, Settings2, MapPin, GitBranch,
   Layers, Wrench, AlignLeft, LayoutGrid, ArrowUpDown, Workflow,
-  Droplets, Cpu, Bomb, GitMerge, MessageCircle, Gamepad2,
+  Droplets, Cpu, Bomb, GitMerge, MessageCircle, Gamepad2, Tag,
 } from 'lucide-react';
 import { GAMES_META, DIFF_COLOR } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
@@ -30,6 +30,7 @@ const GAME_ICONS = {
   merge: GitMerge,
   emojiphrase: MessageCircle,
   twentyfortyeight: Gamepad2,
+  logoguess: Tag,
 };
 
 const FILTERS = ['All', 'Word & Number', 'Visual'];
