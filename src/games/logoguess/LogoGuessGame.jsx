@@ -5,10 +5,14 @@ import { Flame, SkipForward, Trophy, Share2 } from 'lucide-react';
 import { useLogoGuess } from './useLogoGuess.js';
 
 const DIFFICULTY_CONFIG = {
-  easy:   { label: 'Easy',   color: '#22C55E', filter: 'blur(3px)',                              desc: 'Logo ~70% visible' },
-  medium: { label: 'Medium', color: '#F5A623', filter: 'blur(9px) brightness(0.85)',             desc: 'Logo ~40% visible' },
-  hard:   { label: 'Hard',   color: '#EF4444', filter: 'blur(20px) brightness(0.6) saturate(0.3)', desc: 'Logo ~15% visible' },
+  easy:   { label: 'Easy',   color: '#22C55E', filter: 'blur(4px)',                        desc: 'Logo slightly hidden' },
+  medium: { label: 'Medium', color: '#F5A623', filter: 'blur(10px)',                       desc: 'Logo moderately hidden' },
+  hard:   { label: 'Hard',   color: '#EF4444', filter: 'blur(20px) brightness(0.3)',       desc: 'Logo very hidden' },
 };
+
+function logoUrl(domain) {
+  return `https://logo.clearbit.com/${domain}`;
+}
 
 // ── Start Screen ─────────────────────────────────────────────────────────────
 function StartScreen({ onSelect, onBack }) {
@@ -17,8 +21,8 @@ function StartScreen({ onSelect, onBack }) {
       style={{ background: '#0D0F14' }}>
 
       <button onClick={onBack}
-        className="self-start ml-2 mb-8 text-sm font-medium flex items-center gap-1.5"
-        style={{ color: '#8B95A1' }}>
+        className="self-start mb-8 text-sm font-medium flex items-center gap-1.5"
+        style={{ color: '#8B95A1', minHeight: '44px' }}>
         ← Back
       </button>
 
@@ -28,17 +32,13 @@ function StartScreen({ onSelect, onBack }) {
           🏷️
         </div>
         <div>
-          <h1 className="text-3xl font-black tracking-tight" style={{ color: '#F0F0F0' }}>
-            Logo Rush
-          </h1>
-          <p className="text-sm font-medium" style={{ color: '#8B95A1' }}>
-            How far can your streak go?
-          </p>
+          <h1 className="text-3xl font-black tracking-tight" style={{ color: '#F0F0F0' }}>Logo Rush</h1>
+          <p className="text-sm font-medium" style={{ color: '#8B95A1' }}>How far can your streak go?</p>
         </div>
       </div>
 
       <p className="text-center text-sm mb-10 max-w-xs leading-relaxed" style={{ color: '#8B95A1' }}>
-        Identify blurred brand logos as fast as you can. One wrong answer ends your streak.
+        Identify blurred brand logos. One wrong answer ends your streak — but you get 3 skips!
       </p>
 
       <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#F5A623' }}>
@@ -54,7 +54,7 @@ function StartScreen({ onSelect, onBack }) {
             className="w-full rounded-2xl px-5 py-4 flex items-center justify-between text-left"
             style={{
               background: '#161B25',
-              border: `1.5px solid rgba(255,255,255,0.07)`,
+              border: '1.5px solid rgba(255,255,255,0.07)',
               cursor: 'pointer',
               minHeight: '64px',
             }}
@@ -65,9 +65,7 @@ function StartScreen({ onSelect, onBack }) {
               <div className="font-black text-base" style={{ color: cfg.color }}>{cfg.label}</div>
               <div className="text-xs mt-0.5" style={{ color: '#8B95A1' }}>{cfg.desc}</div>
             </div>
-            <span className="text-xl">
-              {key === 'easy' ? '😊' : key === 'medium' ? '🤔' : '😤'}
-            </span>
+            <span className="text-xl">{key === 'easy' ? '😊' : key === 'medium' ? '🤔' : '😤'}</span>
           </motion.button>
         ))}
       </div>
@@ -76,24 +74,27 @@ function StartScreen({ onSelect, onBack }) {
 }
 
 // ── Logo Display ─────────────────────────────────────────────────────────────
-function LogoDisplay({ logo, filter, flash }) {
+function LogoDisplay({ domain, filter, flash, revealed }) {
   const [imgError, setImgError] = useState(false);
+  useEffect(() => { setImgError(false); }, [domain]);
 
-  useEffect(() => { setImgError(false); }, [logo?.logo]);
+  const activeFilter = revealed ? 'none' : filter;
 
-  const flashBg = flash === 'correct'
-    ? 'rgba(34,197,94,0.25)'
+  const borderColor = flash === 'correct'
+    ? 'rgba(34,197,94,0.5)'
     : flash === 'wrong'
-    ? 'rgba(239,68,68,0.25)'
-    : 'transparent';
+    ? 'rgba(239,68,68,0.5)'
+    : 'rgba(255,255,255,0.07)';
 
   return (
-    <div className="relative rounded-3xl overflow-hidden flex items-center justify-center"
+    <div className="relative flex items-center justify-center rounded-3xl overflow-hidden"
       style={{
-        width: '100%', maxWidth: 320, aspectRatio: '1 / 1',
+        width: '100%',
+        maxWidth: 280,
+        aspectRatio: '1 / 1',
         background: '#161B25',
-        border: '1px solid rgba(255,255,255,0.07)',
-        transition: 'background 0.2s',
+        border: `1.5px solid ${borderColor}`,
+        transition: 'border-color 0.2s',
       }}>
 
       {/* Flash overlay */}
@@ -104,40 +105,36 @@ function LogoDisplay({ logo, filter, flash }) {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             style={{
-              position: 'absolute', inset: 0, borderRadius: '24px',
-              background: flashBg, zIndex: 10, pointerEvents: 'none',
+              position: 'absolute', inset: 0, zIndex: 10, pointerEvents: 'none',
+              background: flash === 'correct' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
             }}
           />
         )}
       </AnimatePresence>
 
-      {/* White logo pad */}
-      <div className="rounded-2xl flex items-center justify-center overflow-hidden"
-        style={{ width: '72%', height: '72%', background: '#FFFFFF' }}>
-        {imgError ? (
-          <div className="flex items-center justify-center w-full h-full"
-            style={{ fontSize: 56, fontWeight: 900, color: '#F5A623', fontFamily: 'Inter, sans-serif' }}>
-            {logo?.name?.[0] ?? '?'}
-          </div>
-        ) : (
-          <img
-            key={logo?.logo}
-            src={logo?.logo}
-            alt="Brand logo"
-            onError={() => setImgError(true)}
-            draggable={false}
-            style={{
-              width: '80%', height: '80%',
-              objectFit: 'contain',
-              filter,
-              transition: 'filter 0.3s ease',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
-      </div>
+      {imgError ? (
+        <div style={{ fontSize: 64, fontWeight: 900, color: 'rgba(245,166,35,0.4)', userSelect: 'none' }}>
+          ?
+        </div>
+      ) : (
+        <img
+          key={domain}
+          src={logoUrl(domain)}
+          alt="Brand logo"
+          onError={() => setImgError(true)}
+          draggable={false}
+          style={{
+            width: 200,
+            height: 200,
+            objectFit: 'contain',
+            filter: activeFilter,
+            transition: 'filter 0.4s ease',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -148,14 +145,15 @@ function GameScreen({ game, difficulty, onBack }) {
   const { color, label, filter } = DIFFICULTY_CONFIG[difficulty];
 
   useEffect(() => {
-    if (!game.gameOver && !game.flash) {
-      inputRef.current?.focus();
-    }
-  }, [game.current, game.gameOver, game.flash]);
+    if (!game.flash) inputRef.current?.focus();
+  }, [game.current, game.flash]);
 
   function handleKey(e) {
     if (e.key === 'Enter') game.handleGuess();
   }
+
+  const canSubmit = !game.flash && !!game.input.trim();
+  const canSkip   = !game.flash && game.skipsLeft > 0;
 
   return (
     <div className="min-h-screen flex flex-col items-center pb-24 pt-4 overflow-x-hidden"
@@ -178,31 +176,38 @@ function GameScreen({ game, difficulty, onBack }) {
           </span>
         </div>
 
-        {/* Streak */}
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
           style={{ background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.25)' }}>
           <Flame size={14} color="#F5A623" />
-          <span className="font-black text-base" style={{ color: '#F5A623', fontFamily: 'JetBrains Mono, monospace' }}>
+          <span className="font-black text-base"
+            style={{ color: '#F5A623', fontFamily: 'JetBrains Mono, monospace' }}>
             {game.streak}
           </span>
         </div>
       </div>
 
       {/* Logo */}
-      <div className="px-6 mb-8 flex justify-center w-full">
-        <LogoDisplay logo={game.current} filter={filter} flash={game.flash} />
+      <div className="px-6 mb-6 flex justify-center w-full">
+        <LogoDisplay
+          domain={game.current?.domain}
+          filter={filter}
+          flash={game.flash}
+          revealed={game.flash === 'correct'}
+        />
       </div>
 
-      {/* Correct / Wrong feedback text */}
+      {/* Feedback text */}
       <AnimatePresence mode="wait">
-        {game.flash && (
+        {game.flash ? (
           <motion.p
             key={game.flash}
-            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="text-sm font-bold mb-3"
-            style={{ color: game.flash === 'correct' ? '#22C55E' : '#EF4444' }}>
-            {game.flash === 'correct' ? '✓ Correct!' : '✗ Wrong!'}
+            initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="text-sm font-bold mb-4"
+            style={{ color: game.flash === 'correct' ? '#22C55E' : '#EF4444', minHeight: 20 }}>
+            {game.flash === 'correct' ? '✓ Correct!' : `✗ It was ${game.wrongAnswer}`}
           </motion.p>
+        ) : (
+          <div style={{ minHeight: 20, marginBottom: 16 }} />
         )}
       </AnimatePresence>
 
@@ -222,7 +227,11 @@ function GameScreen({ game, difficulty, onBack }) {
           className="w-full rounded-2xl px-5 py-3.5 text-base font-semibold text-center outline-none"
           style={{
             background: '#161B25',
-            border: `1.5px solid ${game.flash === 'correct' ? '#22C55E' : game.flash === 'wrong' ? '#EF4444' : 'rgba(255,255,255,0.1)'}`,
+            border: `1.5px solid ${
+              game.flash === 'correct' ? '#22C55E' :
+              game.flash === 'wrong'   ? '#EF4444' :
+              'rgba(255,255,255,0.1)'
+            }`,
             color: '#F0F0F0',
             caretColor: '#F5A623',
             minHeight: '52px',
@@ -231,55 +240,60 @@ function GameScreen({ game, difficulty, onBack }) {
         />
       </div>
 
-      {/* Buttons */}
+      {/* Submit + Skip */}
       <div className="w-full max-w-sm px-4 flex gap-3">
         <motion.button
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: canSubmit ? 0.97 : 1 }}
           onClick={game.handleGuess}
-          disabled={!!game.flash || !game.input.trim()}
+          disabled={!canSubmit}
           className="flex-1 rounded-2xl font-black text-sm flex items-center justify-center"
           style={{
             minHeight: '52px',
-            background: (!game.flash && game.input.trim())
+            background: canSubmit
               ? 'linear-gradient(135deg, #F5A623 0%, #FFB84D 100%)'
-              : 'rgba(245,166,35,0.15)',
-            color: (!game.flash && game.input.trim()) ? '#0D0F14' : 'rgba(245,166,35,0.35)',
-            boxShadow: (!game.flash && game.input.trim()) ? '0 4px 16px rgba(245,166,35,0.3)' : 'none',
-            transition: 'background 150ms, box-shadow 150ms, color 150ms',
-            cursor: (!game.flash && game.input.trim()) ? 'pointer' : 'not-allowed',
+              : 'rgba(245,166,35,0.12)',
+            color: canSubmit ? '#0D0F14' : 'rgba(245,166,35,0.3)',
+            boxShadow: canSubmit ? '0 4px 16px rgba(245,166,35,0.3)' : 'none',
+            cursor: canSubmit ? 'pointer' : 'not-allowed',
+            transition: 'background 150ms, box-shadow 150ms',
           }}>
           Submit
         </motion.button>
 
         <motion.button
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: canSkip ? 0.97 : 1 }}
           onClick={game.handleSkip}
-          disabled={!!game.flash}
+          disabled={!canSkip}
           className="rounded-2xl font-bold text-sm flex items-center justify-center gap-1.5 px-4"
           style={{
             minHeight: '52px',
             background: 'transparent',
-            border: '1.5px solid rgba(255,255,255,0.1)',
-            color: game.flash ? 'rgba(139,149,161,0.3)' : '#8B95A1',
-            cursor: game.flash ? 'not-allowed' : 'pointer',
+            border: `1.5px solid ${canSkip ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)'}`,
+            color: canSkip ? '#8B95A1' : 'rgba(139,149,161,0.25)',
+            cursor: canSkip ? 'pointer' : 'not-allowed',
             transition: 'border-color 150ms, color 150ms',
+            minWidth: 80,
           }}
-          onMouseEnter={e => { if (!game.flash) { e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; e.currentTarget.style.color = '#EF4444'; } }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = game.flash ? 'rgba(139,149,161,0.3)' : '#8B95A1'; }}>
-          <SkipForward size={14} />
-          Skip
+          onMouseEnter={e => { if (canSkip) { e.currentTarget.style.borderColor = 'rgba(245,166,35,0.3)'; e.currentTarget.style.color = '#F5A623'; } }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = canSkip ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = canSkip ? '#8B95A1' : 'rgba(139,149,161,0.25)'; }}>
+          <SkipForward size={13} />
+          <span>Skip</span>
+          <span className="font-black text-xs"
+            style={{ fontFamily: 'JetBrains Mono, monospace', opacity: canSkip ? 0.7 : 0.3 }}>
+            {game.skipsLeft}
+          </span>
         </motion.button>
       </div>
 
-      <p className="text-xs mt-6" style={{ color: 'rgba(139,149,161,0.5)' }}>
-        Skip ends your streak
+      <p className="text-xs mt-5" style={{ color: 'rgba(139,149,161,0.4)' }}>
+        Wrong answer ends your streak · Skips do not
       </p>
     </div>
   );
 }
 
 // ── Game Over Screen ──────────────────────────────────────────────────────────
-function GameOverScreen({ streak, difficulty, onShare, onRestart, onSameDifficulty }) {
+function GameOverScreen({ streak, wrongAnswer, difficulty, onShare, onRestart, onSameDifficulty }) {
   const { color, label } = DIFFICULTY_CONFIG[difficulty];
   const medal = streak >= 20 ? '🥇' : streak >= 10 ? '🥈' : streak >= 5 ? '🥉' : '🏁';
 
@@ -294,36 +308,48 @@ function GameOverScreen({ streak, difficulty, onShare, onRestart, onSameDifficul
         className="w-full max-w-sm rounded-3xl p-8 flex flex-col items-center text-center"
         style={{ background: '#161B25', border: '1px solid rgba(255,255,255,0.07)' }}>
 
-        <div className="text-6xl mb-4">{medal}</div>
+        <div className="text-5xl mb-4">{medal}</div>
 
         <h2 className="text-2xl font-black mb-1" style={{ color: '#F0F0F0' }}>
           {streak === 0 ? 'No streak!' : 'Streak ended!'}
         </h2>
+
+        {wrongAnswer && (
+          <div className="mt-2 mb-4 px-4 py-2.5 rounded-2xl w-full"
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-0.5" style={{ color: 'rgba(239,68,68,0.6)' }}>
+              Correct answer was
+            </p>
+            <p className="text-lg font-black" style={{ color: '#EF4444' }}>{wrongAnswer}</p>
+          </div>
+        )}
+
         <p className="text-sm mb-6" style={{ color: '#8B95A1' }}>
           {streak === 0
-            ? 'Better luck next time — give it another shot!'
+            ? 'Give it another shot!'
             : `You identified ${streak} logo${streak !== 1 ? 's' : ''} in a row!`}
         </p>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 w-full mb-6">
-          <div className="rounded-2xl p-4" style={{ background: 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.12)' }}>
+          <div className="rounded-2xl p-4"
+            style={{ background: 'rgba(245,166,35,0.06)', border: '1px solid rgba(245,166,35,0.12)' }}>
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Flame size={14} color="#F5A623" />
+              <Flame size={13} color="#F5A623" />
               <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#8B95A1' }}>Streak</span>
             </div>
-            <div className="text-3xl font-black" style={{ color: '#F5A623', fontFamily: 'JetBrains Mono, monospace' }}>
+            <div className="text-3xl font-black"
+              style={{ color: '#F5A623', fontFamily: 'JetBrains Mono, monospace' }}>
               {streak}
             </div>
           </div>
-          <div className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="rounded-2xl p-4"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Trophy size={14} color={color} />
+              <Trophy size={13} color={color} />
               <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#8B95A1' }}>Mode</span>
             </div>
-            <div className="text-lg font-black" style={{ color }}>
-              {label}
-            </div>
+            <div className="text-lg font-black" style={{ color }}>{label}</div>
           </div>
         </div>
 
@@ -388,15 +414,6 @@ export default function LogoGuessGame() {
     setDifficulty(d);
   }
 
-  function handleSameDifficulty() {
-    game.newGame();
-  }
-
-  function handleChangeDifficulty() {
-    game.newGame();
-    setDifficulty(null);
-  }
-
   if (!difficulty) {
     return <StartScreen onSelect={handleSelectDifficulty} onBack={() => navigate('/games')} />;
   }
@@ -405,10 +422,11 @@ export default function LogoGuessGame() {
     return (
       <GameOverScreen
         streak={game.streak}
+        wrongAnswer={game.wrongAnswer}
         difficulty={difficulty}
         onShare={game.shareResult}
-        onRestart={handleChangeDifficulty}
-        onSameDifficulty={handleSameDifficulty}
+        onRestart={() => { game.newGame(); setDifficulty(null); }}
+        onSameDifficulty={game.newGame}
       />
     );
   }

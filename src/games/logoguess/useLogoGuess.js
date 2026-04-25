@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { LOGOS } from './logoData.js';
 
+const MAX_SKIPS = 3;
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -22,17 +24,19 @@ function isMatch(input, logo) {
 }
 
 export function useLogoGuess(difficulty = 'medium') {
-  const [queue, setQueue]     = useState(() => shuffle(LOGOS));
-  const [idx, setIdx]         = useState(0);
-  const [streak, setStreak]   = useState(0);
+  const [queue, setQueue]       = useState(() => shuffle(LOGOS));
+  const [idx, setIdx]           = useState(0);
+  const [streak, setStreak]     = useState(0);
+  const [skipsLeft, setSkipsLeft] = useState(MAX_SKIPS);
   const [gameOver, setGameOver] = useState(false);
-  const [input, setInput]     = useState('');
-  const [flash, setFlash]     = useState(null); // null | 'correct' | 'wrong'
+  const [wrongAnswer, setWrongAnswer] = useState(null); // correct name shown on game over
+  const [input, setInput]       = useState('');
+  const [flash, setFlash]       = useState(null); // null | 'correct' | 'wrong'
   const timerRef = useRef(null);
 
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
-  // Reshuffle when we exhaust the queue — endless play
+  // Reshuffle when queue exhausted — endless play
   useEffect(() => {
     if (!gameOver && idx >= queue.length) {
       setQueue(shuffle(LOGOS));
@@ -52,19 +56,23 @@ export function useLogoGuess(difficulty = 'medium') {
       timerRef.current = setTimeout(() => {
         setFlash(null);
         setIdx(i => i + 1);
-      }, 500);
+      }, 600);
     } else {
+      setWrongAnswer(current.name);
       setFlash('wrong');
       timerRef.current = setTimeout(() => {
         setFlash(null);
         setGameOver(true);
-      }, 800);
+      }, 900);
     }
   }
 
+  // Skip moves to next logo, preserves streak, costs one skip token
   function handleSkip() {
-    if (gameOver || flash) return;
-    setGameOver(true);
+    if (gameOver || flash || skipsLeft <= 0) return;
+    setSkipsLeft(s => s - 1);
+    setInput('');
+    setIdx(i => i + 1);
   }
 
   function newGame() {
@@ -72,7 +80,9 @@ export function useLogoGuess(difficulty = 'medium') {
     setQueue(shuffle(LOGOS));
     setIdx(0);
     setStreak(0);
+    setSkipsLeft(MAX_SKIPS);
     setGameOver(false);
+    setWrongAnswer(null);
     setInput('');
     setFlash(null);
   }
@@ -90,7 +100,9 @@ export function useLogoGuess(difficulty = 'medium') {
   return {
     current,
     streak,
+    skipsLeft,
     gameOver,
+    wrongAnswer,
     input,
     setInput,
     flash,
