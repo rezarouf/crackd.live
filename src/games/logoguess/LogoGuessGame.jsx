@@ -10,9 +10,6 @@ const DIFFICULTY_CONFIG = {
   hard:   { label: 'Hard',   color: '#EF4444', filter: 'blur(20px) brightness(0.3)',       desc: 'Logo very hidden' },
 };
 
-function logoUrl(domain) {
-  return `https://logo.clearbit.com/${domain}`;
-}
 
 // ── Start Screen ─────────────────────────────────────────────────────────────
 function StartScreen({ onSelect, onBack }) {
@@ -74,9 +71,9 @@ function StartScreen({ onSelect, onBack }) {
 }
 
 // ── Logo Display ─────────────────────────────────────────────────────────────
-function LogoDisplay({ domain, filter, flash, revealed }) {
+function LogoDisplay({ imageUrl, filter, flash, revealed }) {
   const [imgError, setImgError] = useState(false);
-  useEffect(() => { setImgError(false); }, [domain]);
+  useEffect(() => { setImgError(false); }, [imageUrl]);
 
   const activeFilter = revealed ? 'none' : filter;
 
@@ -118,8 +115,8 @@ function LogoDisplay({ domain, filter, flash, revealed }) {
         </div>
       ) : (
         <img
-          key={domain}
-          src={logoUrl(domain)}
+          key={imageUrl}
+          src={imageUrl}
           alt="Brand logo"
           onError={() => setImgError(true)}
           draggable={false}
@@ -189,7 +186,7 @@ function GameScreen({ game, difficulty, onBack }) {
       {/* Logo */}
       <div className="px-6 mb-6 flex justify-center w-full">
         <LogoDisplay
-          domain={game.current?.domain}
+          imageUrl={game.current?.imageUrl}
           filter={filter}
           flash={game.flash}
           revealed={game.flash === 'correct'}
