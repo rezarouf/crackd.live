@@ -205,7 +205,7 @@ export default function LeaderboardPage() {
     try {
       let query = supabase
         .from('leaderboard_entries')
-        .select('user_id, username, xp, streak, country, game_type')
+        .select('user_id, xp, streak, country, game_type, profiles(username, avatar_url)')
         .order('xp', { ascending: false })
         .limit(50);
 
@@ -221,12 +221,13 @@ export default function LeaderboardPage() {
 
       setPlayers(
         (data || []).map((p, i) => ({
-          rank:     i + 1,
-          userId:   p.user_id,
-          username: p.username || 'Anonymous',
-          xp:       p.xp       || 0,
-          streak:   p.streak   || 0,
-          country:  p.country  || '🌍',
+          rank:      i + 1,
+          userId:    p.user_id,
+          username:  p.profiles?.username   || 'Anonymous',
+          avatar:    p.profiles?.avatar_url || null,
+          xp:        p.xp                   || 0,
+          streak:    p.streak               || 0,
+          country:   p.country              || '🌍',
         }))
       );
     } catch (err) {

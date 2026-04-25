@@ -141,11 +141,26 @@ function AppInner() {
       background: '#0D0F14',
       height: '100vh',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      color: '#F5A623',
-      fontFamily: 'Inter',
-    }}>Loading...</div>
+      gap: '16px',
+      fontFamily: 'Inter, sans-serif',
+    }}>
+      <style>{`@keyframes crackd-pulse{0%,100%{opacity:.7;transform:scale(.97)}50%{opacity:1;transform:scale(1)}}`}</style>
+      <div style={{
+        fontSize: '2rem',
+        fontWeight: 900,
+        letterSpacing: '-0.03em',
+        color: '#F5A623',
+        animation: 'crackd-pulse 1.4s ease-in-out infinite',
+      }}>
+        CRACKD.L<span style={{ color: '#F5A623' }}>⚡</span>VE
+      </div>
+      <span style={{ fontSize: '13px', color: '#8B95A1', fontWeight: 500, letterSpacing: '0.04em' }}>
+        Loading...
+      </span>
+    </div>
   );
 
   return (

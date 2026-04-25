@@ -7,6 +7,7 @@ function getUtcDateString(date = new Date()) {
   return date.toISOString().slice(0, 10); // "YYYY-MM-DD"
 }
 
+// ── Daily seed ────────────────────────────────────────────────────────────────
 // Deterministic numeric seed derived from today's UTC date.
 // Every user worldwide resolves to the same seed on the same UTC day.
 export function getDailySeed(gameId = '') {
@@ -18,6 +19,20 @@ export function getDailySeed(gameId = '') {
     hash = (hash * 31 + gameId.charCodeAt(i)) >>> 0;
   }
   return hash;
+}
+
+// ── Free play seed ────────────────────────────────────────────────────────────
+// Returns a fresh random seed every call — never reuses the daily seed.
+// Call this each time the player starts a new free-play game.
+export function getFreePlaySeed() {
+  return (Math.random() * 0xFFFFFFFF) >>> 0;
+}
+
+// ── Unified helper ────────────────────────────────────────────────────────────
+// Single entry point for game hooks: pass isDaily=true for the shared daily
+// puzzle, isDaily=false for a fresh random puzzle on every new game.
+export function getSeed(gameId = '', isDaily = true) {
+  return isDaily ? getDailySeed(gameId) : getFreePlaySeed();
 }
 
 export function useDailyChallenge() {

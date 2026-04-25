@@ -141,13 +141,7 @@ export default function WordleGame({ mode = 'normal', daily = true }) {
         autoCapitalize="off"
         spellCheck={false}
         style={{ position: 'fixed', left: '-9999px', top: 0, width: 1, height: 1, opacity: 0 }}
-        onKeyDown={(e) => {
-          if (e.ctrlKey || e.metaKey || e.altKey) return;
-          e.preventDefault();
-          if (e.key === 'Backspace') handleKey('BACKSPACE');
-          else if (e.key === 'Enter') handleKey('ENTER');
-          else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
-        }}
+        onKeyDown={(e) => { e.preventDefault(); }}
       />
 
       {/* Header */}

@@ -35,6 +35,28 @@
   input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
+
+  /* Minimum 44px touch targets for all buttons */
+  button, [role='button'] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Remove tap highlight on interactive elements */
+  button, a, [role='button'], input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent double-tap zoom on game elements */
+  .game-board, .tile, .key, canvas {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on game boards */
+  .game-board, .tile, .key {
+    user-select: none;
+    -webkit-user-select: none;
+  }
 }
 
 @layer components {
