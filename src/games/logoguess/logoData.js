@@ -1,221 +1,123 @@
-// 50+ well-known global brands with direct Wikimedia Commons image URLs
+const si = (slug) => `https://cdn.simpleicons.org/${slug}`;
+
 export const LOGOS = [
 
   // ── Technology ──────────────────────────────────────────────────────────
-  {
-    name: 'Apple', answer: 'apple', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png',
-  },
-  {
-    name: 'Google', answer: 'google', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/2560px-Google_2015_logo.svg.png',
-  },
-  {
-    name: 'Microsoft', answer: 'microsoft', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1200px-Microsoft_logo.svg.png',
-  },
-  {
-    name: 'Samsung', answer: 'samsung', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/1200px-Samsung_Logo.svg.png',
-  },
-  {
-    name: 'Amazon', answer: 'amazon', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1200px-Amazon_logo.svg.png',
-  },
-  {
-    name: 'Netflix', answer: 'netflix', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1200px-Netflix_2015_logo.svg.png',
-  },
-  {
-    name: 'YouTube', answer: 'youtube', category: 'Tech', aliases: ['yt'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/1200px-YouTube_Logo_2017.svg.png',
-  },
-  {
-    name: 'Instagram', answer: 'instagram', category: 'Tech', aliases: ['insta'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1200px-Instagram_logo_2016.svg.png',
-  },
-  {
-    name: 'Facebook', answer: 'facebook', category: 'Tech', aliases: ['fb', 'meta'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Facebook_f_logo_%282019%29.svg/1200px-Facebook_f_logo_%282019%29.svg.png',
-  },
-  {
-    name: 'Twitter', answer: 'twitter', category: 'Tech', aliases: ['x'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/1200px-Logo_of_Twitter.svg.png',
-  },
-  {
-    name: 'Spotify', answer: 'spotify', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/1200px-Spotify_logo_without_text.svg.png',
-  },
-  {
-    name: 'Uber', answer: 'uber', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/1200px-Uber_logo_2018.svg.png',
-  },
-  {
-    name: 'Airbnb', answer: 'airbnb', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_B%C3%A9lo.svg/1200px-Airbnb_Logo_B%C3%A9lo.svg.png',
-  },
-  {
-    name: 'PayPal', answer: 'paypal', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PayPal_logo.svg/1200px-PayPal_logo.svg.png',
-  },
-  {
-    name: 'Intel', answer: 'intel', category: 'Tech',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Intel_logo_%282006-2020%29.svg/1200px-Intel_logo_%282006-2020%29.svg.png',
-  },
+  { name: 'Apple',       answer: 'apple',       category: 'Tech',    imageUrl: si('apple') },
+  { name: 'Google',      answer: 'google',      category: 'Tech',    imageUrl: si('google') },
+  { name: 'Microsoft',   answer: 'microsoft',   category: 'Tech',    imageUrl: si('microsoft') },
+  { name: 'Amazon',      answer: 'amazon',      category: 'Tech',    imageUrl: si('amazon') },
+  { name: 'Tesla',       answer: 'tesla',       category: 'Tech',    imageUrl: si('tesla') },
+  { name: 'Nvidia',      answer: 'nvidia',      category: 'Tech',    imageUrl: si('nvidia') },
+  { name: 'Intel',       answer: 'intel',       category: 'Tech',    imageUrl: si('intel') },
+  { name: 'AMD',         answer: 'amd',         category: 'Tech',    imageUrl: si('amd') },
+  { name: 'Dell',        answer: 'dell',        category: 'Tech',    imageUrl: si('dell') },
+  { name: 'HP',          answer: 'hp',          category: 'Tech',    imageUrl: si('hp') },
+  { name: 'Lenovo',      answer: 'lenovo',      category: 'Tech',    imageUrl: si('lenovo') },
+  { name: 'Asus',        answer: 'asus',        category: 'Tech',    imageUrl: si('asus') },
+  { name: 'Adobe',       answer: 'adobe',       category: 'Tech',    imageUrl: si('adobe') },
+  { name: 'Samsung',     answer: 'samsung',     category: 'Tech',    imageUrl: si('samsung') },
+  { name: 'LG',          answer: 'lg',          category: 'Tech',    imageUrl: si('lg') },
+  { name: 'Sony',        answer: 'sony',        category: 'Tech',    imageUrl: si('sony') },
+  { name: 'Philips',     answer: 'philips',     category: 'Tech',    imageUrl: si('philips') },
+  { name: 'Nikon',       answer: 'nikon',       category: 'Tech',    imageUrl: si('nikon') },
+  { name: 'Canon',       answer: 'canon',       category: 'Tech',    imageUrl: si('canon') },
+  { name: 'GoPro',       answer: 'gopro',       category: 'Tech',    imageUrl: si('gopro') },
+  { name: 'Bose',        answer: 'bose',        category: 'Tech',    imageUrl: si('bose') },
+
+  // ── Social & Apps ───────────────────────────────────────────────────────
+  { name: 'YouTube',    answer: 'youtube',    category: 'Social', aliases: ['yt'],      imageUrl: si('youtube') },
+  { name: 'Instagram',  answer: 'instagram',  category: 'Social', aliases: ['insta'],   imageUrl: si('instagram') },
+  { name: 'Facebook',   answer: 'facebook',   category: 'Social', aliases: ['fb', 'meta'], imageUrl: si('facebook') },
+  { name: 'Twitter',    answer: 'twitter',    category: 'Social', aliases: ['x'],       imageUrl: si('twitter') },
+  { name: 'TikTok',     answer: 'tiktok',     category: 'Social',                       imageUrl: si('tiktok') },
+  { name: 'Snapchat',   answer: 'snapchat',   category: 'Social',                       imageUrl: si('snapchat') },
+  { name: 'LinkedIn',   answer: 'linkedin',   category: 'Social',                       imageUrl: si('linkedin') },
+  { name: 'WhatsApp',   answer: 'whatsapp',   category: 'Social',                       imageUrl: si('whatsapp') },
+  { name: 'Telegram',   answer: 'telegram',   category: 'Social',                       imageUrl: si('telegram') },
+  { name: 'Discord',    answer: 'discord',    category: 'Social',                       imageUrl: si('discord') },
+  { name: 'Twitch',     answer: 'twitch',     category: 'Social',                       imageUrl: si('twitch') },
+  { name: 'Reddit',     answer: 'reddit',     category: 'Social',                       imageUrl: si('reddit') },
+  { name: 'Pinterest',  answer: 'pinterest',  category: 'Social',                       imageUrl: si('pinterest') },
+  { name: 'Spotify',    answer: 'spotify',    category: 'Social',                       imageUrl: si('spotify') },
+  { name: 'Netflix',    answer: 'netflix',    category: 'Social',                       imageUrl: si('netflix') },
+
+  // ── Productivity & Dev ──────────────────────────────────────────────────
+  { name: 'Zoom',       answer: 'zoom',       category: 'Productivity', imageUrl: si('zoom') },
+  { name: 'Slack',      answer: 'slack',      category: 'Productivity', imageUrl: si('slack') },
+  { name: 'Dropbox',    answer: 'dropbox',    category: 'Productivity', imageUrl: si('dropbox') },
+  { name: 'Notion',     answer: 'notion',     category: 'Productivity', imageUrl: si('notion') },
+  { name: 'Figma',      answer: 'figma',      category: 'Productivity', imageUrl: si('figma') },
+  { name: 'GitHub',     answer: 'github',     category: 'Productivity', imageUrl: si('github') },
+  { name: 'Canva',      answer: 'canva',      category: 'Productivity', imageUrl: si('canva') },
+  { name: 'Shopify',    answer: 'shopify',    category: 'Productivity', imageUrl: si('shopify') },
+  { name: 'WordPress',  answer: 'wordpress',  category: 'Productivity', imageUrl: si('wordpress') },
+  { name: 'Substack',   answer: 'substack',   category: 'Productivity', imageUrl: si('substack') },
+  { name: 'Medium',     answer: 'medium',     category: 'Productivity', imageUrl: si('medium') },
+
+  // ── E-commerce & Finance ────────────────────────────────────────────────
+  { name: 'Uber',       answer: 'uber',       category: 'Finance', imageUrl: si('uber') },
+  { name: 'Airbnb',     answer: 'airbnb',     category: 'Finance', imageUrl: si('airbnb') },
+  { name: 'PayPal',     answer: 'paypal',     category: 'Finance', imageUrl: si('paypal') },
+  { name: 'Visa',       answer: 'visa',       category: 'Finance', imageUrl: si('visa') },
+  { name: 'Mastercard', answer: 'mastercard', category: 'Finance', imageUrl: si('mastercard') },
+  { name: 'eBay',       answer: 'ebay',       category: 'Finance', imageUrl: si('ebay') },
+  { name: 'Alibaba',    answer: 'alibaba',    category: 'Finance', imageUrl: si('alibaba') },
+
+  // ── Gaming ──────────────────────────────────────────────────────────────
+  { name: 'Xbox',        answer: 'xbox',        category: 'Gaming', imageUrl: si('xbox') },
+  { name: 'PlayStation', answer: 'playstation', category: 'Gaming', aliases: ['ps', 'ps5'], imageUrl: si('playstation') },
+  { name: 'Nintendo',    answer: 'nintendo',    category: 'Gaming', imageUrl: si('nintendo') },
+  { name: 'EA',          answer: 'ea',          category: 'Gaming', aliases: ['easports'],  imageUrl: si('ea') },
+  { name: 'Ubisoft',     answer: 'ubisoft',     category: 'Gaming', imageUrl: si('ubisoft') },
+  { name: 'Steam',       answer: 'steam',       category: 'Gaming', imageUrl: si('steam') },
+  { name: 'Epic Games',  answer: 'epicgames',   category: 'Gaming', aliases: ['epic'],      imageUrl: si('epicgames') },
+  { name: 'Roblox',      answer: 'roblox',      category: 'Gaming', imageUrl: si('roblox') },
+
+  // ── Media & News ────────────────────────────────────────────────────────
+  { name: 'BBC',         answer: 'bbc',         category: 'Media', imageUrl: si('bbc') },
+  { name: 'CNN',         answer: 'cnn',         category: 'Media', imageUrl: si('cnn') },
+  { name: 'Reuters',     answer: 'reuters',     category: 'Media', imageUrl: si('reuters') },
+  { name: 'New York Times', answer: 'nyt',      category: 'Media', aliases: ['nytimes', 'new york times'], imageUrl: si('nytimes') },
+  { name: 'Duolingo',    answer: 'duolingo',    category: 'Media', imageUrl: si('duolingo') },
 
   // ── Food & Beverage ─────────────────────────────────────────────────────
-  {
-    name: "McDonald's", answer: 'mcdonalds', category: 'Food', aliases: ['mcdonald'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/McDonald%27s_logo.svg/1200px-McDonald%27s_logo.svg.png',
-  },
-  {
-    name: 'Coca-Cola', answer: 'cocacola', category: 'Food', aliases: ['coke', 'coca cola'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Coca-Cola_logo.svg/1200px-Coca-Cola_logo.svg.png',
-  },
-  {
-    name: 'Pepsi', answer: 'pepsi', category: 'Food',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Pepsi_logo_2014.svg/1200px-Pepsi_logo_2014.svg.png',
-  },
-  {
-    name: 'Starbucks', answer: 'starbucks', category: 'Food',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1200px-Starbucks_Corporation_Logo_2011.svg.png',
-  },
-  {
-    name: 'Red Bull', answer: 'redbull', category: 'Food', aliases: ['red bull'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Red_Bull_logo.svg/1200px-Red_Bull_logo.svg.png',
-  },
-
-  // ── Finance ─────────────────────────────────────────────────────────────
-  {
-    name: 'Visa', answer: 'visa', category: 'Finance',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png',
-  },
-  {
-    name: 'Mastercard', answer: 'mastercard', category: 'Finance',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1200px-Mastercard-logo.svg.png',
-  },
+  { name: "McDonald's", answer: 'mcdonalds', category: 'Food', aliases: ['mcdonald'],           imageUrl: si('mcdonalds') },
+  { name: 'Coca-Cola',  answer: 'cocacola',  category: 'Food', aliases: ['coke', 'coca cola'],  imageUrl: si('cocacola') },
+  { name: 'Pepsi',      answer: 'pepsi',     category: 'Food',                                  imageUrl: si('pepsi') },
+  { name: 'Starbucks',  answer: 'starbucks', category: 'Food',                                  imageUrl: si('starbucks') },
+  { name: 'Red Bull',   answer: 'redbull',   category: 'Food', aliases: ['red bull'],           imageUrl: si('redbull') },
 
   // ── Fashion ─────────────────────────────────────────────────────────────
-  {
-    name: 'Nike', answer: 'nike', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png',
-  },
-  {
-    name: 'Adidas', answer: 'adidas', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Adidas_logo.png/1200px-Adidas_logo.png',
-  },
-  {
-    name: 'Puma', answer: 'puma', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Puma_logo.svg/1200px-Puma_logo.svg.png',
-  },
-  {
-    name: 'Reebok', answer: 'reebok', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Reebok_logo_2019.svg/1200px-Reebok_logo_2019.svg.png',
-  },
-  {
-    name: 'Gucci', answer: 'gucci', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Gucci_Logo.svg/1200px-Gucci_Logo.svg.png',
-  },
-  {
-    name: 'Louis Vuitton', answer: 'louisvuitton', category: 'Fashion', aliases: ['lv', 'louis vuitton'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Louis_Vuitton_logo_and_wordmark.svg/1200px-Louis_Vuitton_logo_and_wordmark.svg.png',
-  },
-  {
-    name: 'Chanel', answer: 'chanel', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Chanel_logo_interlocking_cs.svg/1200px-Chanel_logo_interlocking_cs.svg.png',
-  },
-  {
-    name: 'Dior', answer: 'dior', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Christian_Dior_logo.svg/1200px-Christian_Dior_logo.svg.png',
-  },
-  {
-    name: 'Prada', answer: 'prada', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Prada_logo.svg/1200px-Prada_logo.svg.png',
-  },
-  {
-    name: 'Versace', answer: 'versace', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Versace_logo.svg/1200px-Versace_logo.svg.png',
-  },
-  {
-    name: 'Zara', answer: 'zara', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Zara_Logo.svg/1200px-Zara_Logo.svg.png',
-  },
-  {
-    name: 'Rolex', answer: 'rolex', category: 'Fashion',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Rolex_logo.svg/1200px-Rolex_logo.svg.png',
-  },
+  { name: 'Nike',          answer: 'nike',          category: 'Fashion',                                       imageUrl: si('nike') },
+  { name: 'Adidas',        answer: 'adidas',        category: 'Fashion',                                       imageUrl: si('adidas') },
+  { name: 'Puma',          answer: 'puma',          category: 'Fashion',                                       imageUrl: si('puma') },
+  { name: 'Reebok',        answer: 'reebok',        category: 'Fashion',                                       imageUrl: si('reebok') },
+  { name: 'Gucci',         answer: 'gucci',         category: 'Fashion',                                       imageUrl: si('gucci') },
+  { name: 'Louis Vuitton', answer: 'louisvuitton',  category: 'Fashion', aliases: ['lv', 'louis vuitton'],     imageUrl: si('louisvuitton') },
+  { name: 'Chanel',        answer: 'chanel',        category: 'Fashion',                                       imageUrl: si('chanel') },
+  { name: 'Dior',          answer: 'dior',          category: 'Fashion',                                       imageUrl: si('dior') },
+  { name: 'Prada',         answer: 'prada',         category: 'Fashion',                                       imageUrl: si('prada') },
+  { name: 'Versace',       answer: 'versace',       category: 'Fashion',                                       imageUrl: si('versace') },
+  { name: 'Zara',          answer: 'zara',          category: 'Fashion',                                       imageUrl: si('zara') },
+  { name: 'Rolex',         answer: 'rolex',         category: 'Fashion',                                       imageUrl: si('rolex') },
 
   // ── Automotive ──────────────────────────────────────────────────────────
-  {
-    name: 'BMW', answer: 'bmw', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/BMW.svg/1200px-BMW.svg.png',
-  },
-  {
-    name: 'Mercedes-Benz', answer: 'mercedesbenz', category: 'Auto', aliases: ['mercedes', 'benz'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mercedes-Logo.svg/1200px-Mercedes-Logo.svg.png',
-  },
-  {
-    name: 'Toyota', answer: 'toyota', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Toyota_carlogo.svg/1200px-Toyota_carlogo.svg.png',
-  },
-  {
-    name: 'Ferrari', answer: 'ferrari', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Ferrari-Logo.svg/1200px-Ferrari-Logo.svg.png',
-  },
-  {
-    name: 'Lamborghini', answer: 'lamborghini', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Lamborghini_Logo.svg/1200px-Lamborghini_Logo.svg.png',
-  },
-  {
-    name: 'Audi', answer: 'audi', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Audi-Logo_2016.svg/1200px-Audi-Logo_2016.svg.png',
-  },
-  {
-    name: 'Honda', answer: 'honda', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Honda.svg/1200px-Honda.svg.png',
-  },
-  {
-    name: 'Volkswagen', answer: 'volkswagen', category: 'Auto', aliases: ['vw', 'volkswagon'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Volkswagen_logo_2019.svg/1200px-Volkswagen_logo_2019.svg.png',
-  },
-  {
-    name: 'Hyundai', answer: 'hyundai', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Hyundai_Motor_Company_logo.svg/1200px-Hyundai_Motor_Company_logo.svg.png',
-  },
-  {
-    name: 'Porsche', answer: 'porsche', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/de/thumb/7/70/Porsche_Logo.svg/1200px-Porsche_Logo.svg.png',
-  },
-  {
-    name: 'Bentley', answer: 'bentley', category: 'Auto',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Bentley_logo.svg/1200px-Bentley_logo.svg.png',
-  },
-  {
-    name: 'Rolls-Royce', answer: 'rollsroyce', category: 'Auto', aliases: ['rolls royce'],
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Rolls-Royce_Motor_Cars_logo.svg/1200px-Rolls-Royce_Motor_Cars_logo.svg.png',
-  },
+  { name: 'BMW',           answer: 'bmw',           category: 'Auto',                                          imageUrl: si('bmw') },
+  { name: 'Mercedes-Benz', answer: 'mercedesbenz',  category: 'Auto', aliases: ['mercedes', 'benz'],           imageUrl: si('mercedes') },
+  { name: 'Toyota',        answer: 'toyota',        category: 'Auto',                                          imageUrl: si('toyota') },
+  { name: 'Ferrari',       answer: 'ferrari',       category: 'Auto',                                          imageUrl: si('ferrari') },
+  { name: 'Lamborghini',   answer: 'lamborghini',   category: 'Auto',                                          imageUrl: si('lamborghini') },
+  { name: 'Audi',          answer: 'audi',          category: 'Auto',                                          imageUrl: si('audi') },
+  { name: 'Honda',         answer: 'honda',         category: 'Auto',                                          imageUrl: si('honda') },
+  { name: 'Volkswagen',    answer: 'volkswagen',    category: 'Auto', aliases: ['vw', 'volkswagon'],           imageUrl: si('volkswagen') },
+  { name: 'Hyundai',       answer: 'hyundai',       category: 'Auto',                                          imageUrl: si('hyundai') },
+  { name: 'Porsche',       answer: 'porsche',       category: 'Auto',                                          imageUrl: si('porsche') },
 
-  // ── Airlines ────────────────────────────────────────────────────────────
-  {
-    name: 'Emirates', answer: 'emirates', category: 'Airline',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Emirates_logo.svg/1200px-Emirates_logo.svg.png',
-  },
-
-  // ── Energy ──────────────────────────────────────────────────────────────
-  {
-    name: 'Shell', answer: 'shell', category: 'Energy',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Shell_logo.svg/1200px-Shell_logo.svg.png',
-  },
+  // ── Airlines & Energy ───────────────────────────────────────────────────
+  { name: 'Emirates', answer: 'emirates', category: 'Airline', imageUrl: si('emirates') },
+  { name: 'Shell',    answer: 'shell',    category: 'Energy',  imageUrl: si('shell') },
 
   // ── Retail ──────────────────────────────────────────────────────────────
-  {
-    name: 'IKEA', answer: 'ikea', category: 'Retail',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Ikea_logo.svg/1200px-Ikea_logo.svg.png',
-  },
-
-  // ── Media & Entertainment ───────────────────────────────────────────────
-  {
-    name: 'Sony', answer: 'sony', category: 'Media',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1200px-Sony_logo.svg.png',
-  },
+  { name: 'IKEA', answer: 'ikea', category: 'Retail', imageUrl: si('ikea') },
 ];

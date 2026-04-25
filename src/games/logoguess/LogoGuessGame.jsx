@@ -75,7 +75,7 @@ function LogoDisplay({ imageUrl, filter, flash, revealed }) {
   const [imgError, setImgError] = useState(false);
   useEffect(() => { setImgError(false); }, [imageUrl]);
 
-  const activeFilter = revealed ? 'none' : filter;
+  const activeFilter = revealed ? 'invert(1)' : `${filter} invert(1)`;
 
   const borderColor = flash === 'correct'
     ? 'rgba(34,197,94,0.5)'
