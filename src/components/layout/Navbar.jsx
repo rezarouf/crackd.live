@@ -7,6 +7,7 @@ import { getLevelInfo } from '../../lib/utils.js';
 import { useDailyChallenge } from '../../hooks/useDailyChallenge.js';
 import { LogoMark } from '../ui/Logo.jsx';
 import { Flame, User, Trophy, LogOut } from 'lucide-react';
+import { supabase } from '../../lib/supabase.js';
 
 const NAV_LINKS = [
   { to: '/games',       label: 'Games'       },
@@ -22,6 +23,12 @@ export default function Navbar() {
   const { completedCount, totalGames } = useDailyChallenge();
   const navigate  = useNavigate();
   const location  = useLocation();
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    signOut();
+    navigate('/');
+  }
 
   const overallStreak = Math.max(0, ...Object.values(streaks));
   const xp    = profile?.xp || 0;
@@ -193,7 +200,7 @@ export default function Navbar() {
                         </div>
                         <div className="border-t border-white/[0.06] py-1.5">
                           <button
-                            onClick={() => signOut()}
+                            onClick={handleSignOut}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red/80 hover:text-red hover:bg-red/[0.06] transition-[color,background-color] duration-150"
                           >
                             <LogOut size={15} />

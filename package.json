@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed": "node scripts/seed.js"
   },
-"dependencies": {
+  "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
     "@vitejs/plugin-react": "^4.3.4",
     "axios": "^1.7.9",
     "canvas-confetti": "^1.9.3",
+    "dotenv": "^17.4.2",
     "framer-motion": "^11.15.0",
     "gsap": "^3.12.5",
     "konva": "^9.3.15",
