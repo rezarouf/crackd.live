@@ -21,6 +21,32 @@ export function getDailySeed(gameId = '') {
   return hash;
 }
 
+// ── Daily state key ───────────────────────────────────────────────────────────
+// Returns a date-scoped localStorage key so each day gets isolated state.
+// Example: crackd_screw_2026-04-26
+export function getDailyStateKey(gameId) {
+  return `crackd_${gameId}_${getUtcDateString()}`;
+}
+
+// ── Stale state cleanup ───────────────────────────────────────────────────────
+// Removes any localStorage keys that end in a YYYY-MM-DD date that is not today.
+// Game hooks should use getDailyStateKey() so their keys follow this pattern.
+export function clearOldDailyStates() {
+  const today = getUtcDateString();
+  const toDelete = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      const m = key.match(/_(\d{4}-\d{2}-\d{2})$/);
+      if (m && m[1] !== today) toDelete.push(key);
+    }
+    toDelete.forEach(k => localStorage.removeItem(k));
+  } catch {
+    // localStorage unavailable (SSR / private mode) — silently skip
+  }
+}
+
 // ── Free play seed ────────────────────────────────────────────────────────────
 // Returns a fresh random seed every call — never reuses the daily seed.
 // Call this each time the player starts a new free-play game.
@@ -40,6 +66,9 @@ export function useDailyChallenge() {
 
   // Reactive today string — refreshes automatically at midnight UTC.
   const [today, setToday] = useState(() => getUtcDateString());
+
+  // Clear stale daily states once on mount, then again whenever the date flips.
+  useEffect(() => { clearOldDailyStates(); }, [today]);
 
   useEffect(() => {
     function scheduleReset() {
