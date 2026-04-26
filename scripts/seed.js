@@ -119,10 +119,57 @@ try {
   console.log(`❌  ${err.message}`);
 }
 
-// ── Skipped tables ────────────────────────────────────────────────────────────
+// ── 5. Wordle words ───────────────────────────────────────────────────────────
 
-console.log('Skipping wordle_words       — table not created yet');
-console.log('Skipping spellingbee_data   — table not created yet');
-console.log('Skipping wordladder_puzzles — table not created yet');
+try {
+  process.stdout.write('Seeding wordle words... ');
+  const { ANSWER_WORDS } = await import('../src/games/wordle/wordbank.js');
+  const rows = ANSWER_WORDS.map(w => ({ word: w.toLowerCase() }));
+  for (let i = 0; i < rows.length; i += 500) {
+    const { error } = await supabase
+      .from('wordle_words')
+      .upsert(rows.slice(i, i + 500), { onConflict: 'word', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+  console.log(`${rows.length} words done`);
+} catch (err) {
+  console.log(`❌  ${err.message}`);
+}
+
+// ── 6. Word Ladder puzzles ────────────────────────────────────────────────────
+
+try {
+  process.stdout.write('Seeding word ladder... ');
+  const { WORD_LADDER_PUZZLES } = await import('../src/games/wordladder/wordladderData.js');
+  const rows = WORD_LADDER_PUZZLES.map(p => ({
+    start:    p.start,
+    target:   p.end,
+    steps:    p.steps,
+    solution: p.solution,
+  }));
+  await upsertRows('wordladder_puzzles', rows, 'start,target');
+  console.log(`${rows.length} puzzles done`);
+} catch (err) {
+  console.log(`❌  ${err.message}`);
+}
+
+// ── 7. Spelling Bee puzzles ───────────────────────────────────────────────────
+
+try {
+  process.stdout.write('Seeding spelling bee... ');
+  const { SPELLING_BEE_PUZZLES } = await import('../src/games/spellingbee/spellingbeeData.js');
+  const rows = SPELLING_BEE_PUZZLES.map(p => ({
+    center:  p.center,
+    letters: p.letters,
+    pangram: p.pangram,
+    words:   p.words,
+  }));
+  for (const row of rows) {
+    await supabase.from('spellingbee_data').insert(row);
+  }
+  console.log(`${rows.length} puzzles done`);
+} catch (err) {
+  console.log(`❌  ${err.message}`);
+}
 
 console.log('\n✅  Seed complete.');
