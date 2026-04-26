@@ -749,12 +749,10 @@ function UsersTable() {
 // ─── Word Library ─────────────────────────────────────────────────────────────
 
 const WORD_GAMES = [
-  { id: 'wordle',      label: 'Wordle',      table: 'wordle_words',       field: 'word',   hint: '5-letter words' },
-  { id: 'wordladder',  label: 'Word Ladder',  table: 'wordladder_words',   field: 'word',   hint: 'Ladder words' },
-  { id: 'spellingbee', label: 'Spelling Bee', table: 'spellingbee_words',  field: 'word',   hint: 'Bee words' },
-  { id: 'connections', label: 'Connections',  table: 'connections_words',  field: 'word',   hint: 'Puzzle words' },
-  { id: 'cryptogram',  label: 'Cryptogram',   table: 'cryptogram_phrases', field: 'phrase', hint: 'Phrases / quotes' },
+  { id: 'wordle', label: 'Wordle', table: 'wordle_words', field: 'word', hint: '5-letter words' },
 ];
+
+const LIBRARY_TABS = ['Wordle', 'Word Ladder', 'Spelling Bee'];
 
 function parseWords(text) {
   return [...new Set(
@@ -764,8 +762,8 @@ function parseWords(text) {
   )];
 }
 
-function WordLibrary() {
-  const [game, setGame]           = useState(WORD_GAMES[0]);
+// ── Word Library sub-editor: simple word lists ────────────────────────────────
+function WordGameEditor({ game }) {
   const [words, setWords]         = useState([]);
   const [search, setSearch]       = useState('');
   const [loading, setLoading]     = useState(false);
@@ -774,19 +772,13 @@ function WordLibrary() {
   const [csvPreview, setCsvPreview] = useState(null);
   const [importing, setImporting] = useState(false);
 
-  useEffect(() => {
-    setSearch('');
-    setCsvPreview(null);
-    loadWords();
-  }, [game]);
+  useEffect(() => { setSearch(''); setCsvPreview(null); load(); }, [game]);
 
-  async function loadWords() {
+  async function load() {
     setLoading(true);
     const { data, error } = await supabase
-      .from(game.table)
-      .select('id, ' + game.field)
-      .order(game.field, { ascending: true })
-      .limit(5000);
+      .from(game.table).select('id, ' + game.field)
+      .order(game.field, { ascending: true }).limit(5000);
     setLoading(false);
     if (error) { toast.error('Failed to load'); return; }
     setWords(data || []);
@@ -798,13 +790,8 @@ function WordLibrary() {
     setAdding(true);
     const { error } = await supabase.from(game.table).insert({ [game.field]: val });
     setAdding(false);
-    if (error) {
-      toast.error(error.code === '23505' ? 'Already exists' : error.message);
-    } else {
-      toast.success('Added!');
-      setNewWord('');
-      await loadWords();
-    }
+    if (error) toast.error(error.code === '23505' ? 'Already exists' : error.message);
+    else { toast.success('Added!'); setNewWord(''); await load(); }
   }
 
   async function deleteWord(id) {
@@ -814,17 +801,14 @@ function WordLibrary() {
   }
 
   function handleCSVFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => {
-      const parsed  = parseWords(ev.target.result);
+      const parsed = parseWords(ev.target.result);
       const existing = new Set(words.map(w => w[game.field]));
-      const newOnes  = parsed.filter(w => !existing.has(w));
-      setCsvPreview({ all: parsed, newOnes });
+      setCsvPreview({ all: parsed, newOnes: parsed.filter(w => !existing.has(w)) });
     };
-    reader.readAsText(file);
-    e.target.value = '';
+    reader.readAsText(file); e.target.value = '';
   }
 
   async function importWords() {
@@ -836,156 +820,450 @@ function WordLibrary() {
       if (error) { toast.error(`Import error: ${error.message}`); setImporting(false); return; }
     }
     toast.success(`Imported ${rows.length} words!`);
-    setCsvPreview(null);
-    setImporting(false);
-    await loadWords();
+    setCsvPreview(null); setImporting(false); await load();
   }
 
-  const filtered = words.filter(w =>
-    (w[game.field] || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = words.filter(w => (w[game.field] || '').toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-
-      {/* Game sub-tabs */}
-      <div className="flex gap-1.5 flex-wrap">
-        {WORD_GAMES.map(g => (
-          <button
-            key={g.id}
-            onClick={() => setGame(g)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-[background,color] duration-150
-              ${game.id === g.id
-                ? 'bg-amber/15 text-amber border border-amber/30'
-                : 'text-muted hover:text-text border border-white/[0.08] bg-surface'}`}
-          >
-            {g.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Count + search */}
+    <div className="space-y-5">
       <div className="flex items-center gap-3">
         <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-amber/10 text-amber border border-amber/20 whitespace-nowrap">
           {words.length.toLocaleString()} {game.field}s
         </span>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder={`Filter ${game.label} ${game.field}s…`}
-          className="input flex-1 text-sm"
-        />
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder={`Filter ${game.label} ${game.field}s…`} className="input flex-1 text-sm" />
       </div>
 
-      {/* Word list */}
       <div className="bg-surface border border-white/[0.06] rounded-xl overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-muted text-sm">Loading…</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-8 text-center text-muted text-sm">
-            {search ? 'No matches' : `No ${game.field}s yet — add some below`}
-          </div>
-        ) : (
-          <>
-            <div className="max-h-72 overflow-y-auto divide-y divide-white/[0.04]">
-              {filtered.slice(0, 400).map(w => (
-                <div key={w.id} className="flex items-center justify-between px-4 py-2 hover:bg-white/[0.02] group">
-                  <span className="text-sm font-mono text-text">{w[game.field]}</span>
-                  <button
-                    onClick={() => deleteWord(w.id)}
-                    className="text-xs text-red/40 hover:text-red group-hover:text-red/60 transition-colors duration-150"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-            {filtered.length > 400 && (
-              <div className="px-4 py-2 text-xs text-muted text-center border-t border-white/[0.04]">
-                Showing 400 of {filtered.length} — use search to narrow down
+        {loading ? <div className="p-8 text-center text-muted text-sm">Loading…</div>
+          : filtered.length === 0 ? <div className="p-8 text-center text-muted text-sm">{search ? 'No matches' : `No ${game.field}s yet`}</div>
+          : (
+            <>
+              <div className="max-h-64 overflow-y-auto divide-y divide-white/[0.04]">
+                {filtered.slice(0, 400).map(w => (
+                  <div key={w.id} className="flex items-center justify-between px-4 py-2 hover:bg-white/[0.02] group">
+                    <span className="text-sm font-mono text-text">{w[game.field]}</span>
+                    <button onClick={() => deleteWord(w.id)} className="text-xs text-red/40 hover:text-red group-hover:text-red/60 transition-colors duration-150">✕</button>
+                  </div>
+                ))}
               </div>
-            )}
-          </>
-        )}
+              {filtered.length > 400 && <div className="px-4 py-2 text-xs text-muted text-center border-t border-white/[0.04]">Showing 400 of {filtered.length}</div>}
+            </>
+          )}
       </div>
 
-      {/* Single add */}
       <div className="bg-surface border border-white/[0.06] rounded-xl p-4">
-        <p className="text-xs text-muted font-bold uppercase tracking-wider mb-3">Add Single {game.field}</p>
+        <p className="text-xs text-muted font-bold uppercase tracking-wider mb-3">Add {game.field}</p>
         <div className="flex gap-2">
-          <input
-            value={newWord}
-            onChange={e => setNewWord(e.target.value)}
+          <input value={newWord} onChange={e => setNewWord(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addWord()}
-            placeholder={`Enter a ${game.hint.toLowerCase()}…`}
-            className="input flex-1 text-sm"
-          />
-          <button
-            onClick={addWord}
-            disabled={adding || !newWord.trim()}
-            className="btn btn-primary px-5 text-sm disabled:opacity-40"
-          >
+            placeholder={`Enter a ${game.hint.toLowerCase()}…`} className="input flex-1 text-sm" />
+          <button onClick={addWord} disabled={adding || !newWord.trim()} className="btn btn-primary px-5 text-sm disabled:opacity-40">
             {adding ? '…' : 'Add'}
           </button>
         </div>
       </div>
 
-      {/* Bulk CSV import */}
-      <div className="bg-surface border border-white/[0.06] rounded-xl p-4 space-y-4">
+      <div className="bg-surface border border-white/[0.06] rounded-xl p-4 space-y-3">
         <p className="text-xs text-muted font-bold uppercase tracking-wider">Bulk Import (CSV / TXT)</p>
-        <p className="text-xs text-muted leading-relaxed">
-          Upload a .csv or .txt file. Words separated by commas, newlines, or semicolons.
-          Existing duplicates are skipped automatically.
-        </p>
-
+        <p className="text-xs text-muted">Words separated by commas, newlines, or semicolons. Duplicates skipped.</p>
         <label className="btn btn-secondary text-sm cursor-pointer w-fit">
-          📂 Choose File
-          <input type="file" accept=".csv,.txt" onChange={handleCSVFile} className="hidden" />
+          📂 Choose File <input type="file" accept=".csv,.txt" onChange={handleCSVFile} className="hidden" />
         </label>
-
         {csvPreview && (
           <div className="space-y-3">
             <div className="flex flex-wrap gap-4 text-xs">
               <span className="text-muted">Parsed: <strong className="text-text">{csvPreview.all.length}</strong></span>
               <span className="text-muted">New: <strong className="text-amber">{csvPreview.newOnes.length}</strong></span>
-              <span className="text-muted">Duplicates skipped: <strong className="text-muted/60">{csvPreview.all.length - csvPreview.newOnes.length}</strong></span>
+              <span className="text-muted">Dupes: <strong className="text-muted/60">{csvPreview.all.length - csvPreview.newOnes.length}</strong></span>
             </div>
-
             {csvPreview.newOnes.length > 0 ? (
-              <div className="bg-navy border border-white/[0.06] rounded-xl p-3 max-h-36 overflow-y-auto">
-                <p className="text-xs text-muted mb-2 font-bold">Preview (first 50):</p>
+              <div className="bg-navy border border-white/[0.06] rounded-xl p-3 max-h-28 overflow-y-auto">
                 <div className="flex flex-wrap gap-1.5">
                   {csvPreview.newOnes.slice(0, 50).map((w, i) => (
-                    <span key={i} className="text-xs font-mono px-2 py-0.5 rounded-md bg-amber/10 text-amber border border-amber/20">
-                      {w}
-                    </span>
+                    <span key={i} className="text-xs font-mono px-2 py-0.5 rounded-md bg-amber/10 text-amber border border-amber/20">{w}</span>
                   ))}
-                  {csvPreview.newOnes.length > 50 && (
-                    <span className="text-xs text-muted self-center">+{csvPreview.newOnes.length - 50} more</span>
-                  )}
+                  {csvPreview.newOnes.length > 50 && <span className="text-xs text-muted self-center">+{csvPreview.newOnes.length - 50} more</span>}
                 </div>
               </div>
-            ) : (
-              <p className="text-xs text-muted italic">All words already exist in the library.</p>
-            )}
-
+            ) : <p className="text-xs text-muted italic">All words already exist.</p>}
             <div className="flex gap-2">
               {csvPreview.newOnes.length > 0 && (
-                <button
-                  onClick={importWords}
-                  disabled={importing}
-                  className="btn btn-primary text-sm disabled:opacity-40"
-                >
+                <button onClick={importWords} disabled={importing} className="btn btn-primary text-sm disabled:opacity-40">
                   {importing ? 'Importing…' : `Import ${csvPreview.newOnes.length} Words`}
                 </button>
               )}
-              <button onClick={() => setCsvPreview(null)} className="btn btn-secondary text-sm">
-                Cancel
-              </button>
+              <button onClick={() => setCsvPreview(null)} className="btn btn-secondary text-sm">Cancel</button>
             </div>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── Word Library sub-editor: Word Ladder puzzles ──────────────────────────────
+function WordLadderEditor() {
+  const [puzzles, setPuzzles]   = useState([]);
+  const [loading, setLoading]   = useState(false);
+  const [adding, setAdding]     = useState(false);
+  const [csvPreview, setCsvPreview] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [form, setForm]         = useState({ start: '', target: '', steps: '', solution: '' });
+
+  useEffect(() => { load(); }, []);
+
+  async function load() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('wordladder_puzzles').select('*').order('start', { ascending: true }).limit(500);
+    setLoading(false);
+    if (error) { toast.error('Failed to load'); return; }
+    setPuzzles(data || []);
+  }
+
+  async function addPuzzle() {
+    const { start, target, steps, solution } = form;
+    if (!start.trim() || !target.trim() || !steps) return;
+    const solArr = solution.trim() ? solution.toUpperCase().split(/[\s,]+/).filter(Boolean) : [];
+    setAdding(true);
+    const { error } = await supabase.from('wordladder_puzzles').insert({
+      start: start.toUpperCase().trim(),
+      target: target.toUpperCase().trim(),
+      steps: parseInt(steps, 10),
+      solution: solArr,
+    });
+    setAdding(false);
+    if (error) toast.error(error.code === '23505' ? 'Already exists' : error.message);
+    else { toast.success('Added!'); setForm({ start: '', target: '', steps: '', solution: '' }); await load(); }
+  }
+
+  async function deletePuzzle(id) {
+    const { error } = await supabase.from('wordladder_puzzles').delete().eq('id', id);
+    if (error) toast.error('Failed to delete');
+    else setPuzzles(prev => prev.filter(p => p.id !== id));
+  }
+
+  function handleCSVFile(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const existing = new Set(puzzles.map(p => p.start + '>' + p.target));
+      const parsed = ev.target.result.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean).map(line => {
+        const parts = line.split(',');
+        const start  = (parts[0] || '').trim().toUpperCase();
+        const target = (parts[1] || '').trim().toUpperCase();
+        const steps  = parseInt(parts[2], 10) || 0;
+        const sol    = parts[3] ? parts[3].trim().toUpperCase().split(/\s+/).filter(Boolean) : [];
+        if (!start || !target) return null;
+        return { start, target, steps, solution: sol };
+      }).filter(Boolean);
+      const newOnes = parsed.filter(p => !existing.has(p.start + '>' + p.target));
+      setCsvPreview({ all: parsed, newOnes });
+    };
+    reader.readAsText(file); e.target.value = '';
+  }
+
+  async function importPuzzles() {
+    if (!csvPreview?.newOnes?.length) return;
+    setImporting(true);
+    for (let i = 0; i < csvPreview.newOnes.length; i += 100) {
+      const { error } = await supabase.from('wordladder_puzzles').insert(csvPreview.newOnes.slice(i, i + 100));
+      if (error) { toast.error(`Import error: ${error.message}`); setImporting(false); return; }
+    }
+    toast.success(`Imported ${csvPreview.newOnes.length} puzzles!`);
+    setCsvPreview(null); setImporting(false); await load();
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-amber/10 text-amber border border-amber/20 whitespace-nowrap">
+          {puzzles.length} puzzles
+        </span>
+      </div>
+
+      <div className="bg-surface border border-white/[0.06] rounded-xl overflow-hidden">
+        {loading ? <div className="p-8 text-center text-muted text-sm">Loading…</div>
+          : puzzles.length === 0 ? <div className="p-8 text-center text-muted text-sm">No puzzles yet — add some below</div>
+          : (
+            <>
+              <div className="grid grid-cols-[1fr_1fr_60px_1fr_36px] gap-3 px-4 py-2 border-b border-white/[0.06] text-xs font-bold text-muted uppercase tracking-wider">
+                <span>Start</span><span>Target</span><span>Steps</span><span>Solution</span><span></span>
+              </div>
+              <div className="max-h-64 overflow-y-auto divide-y divide-white/[0.04]">
+                {puzzles.map(p => (
+                  <div key={p.id} className="grid grid-cols-[1fr_1fr_60px_1fr_36px] gap-3 px-4 py-2.5 items-center hover:bg-white/[0.02] group">
+                    <span className="text-sm font-mono text-amber">{p.start}</span>
+                    <span className="text-sm font-mono text-amber">{p.target}</span>
+                    <span className="text-xs text-muted font-mono">{p.steps}</span>
+                    <span className="text-xs text-muted font-mono truncate">{Array.isArray(p.solution) ? p.solution.join(' → ') : p.solution}</span>
+                    <button onClick={() => deletePuzzle(p.id)} className="text-xs text-red/40 hover:text-red group-hover:text-red/60 transition-colors duration-150 text-center">✕</button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+      </div>
+
+      <div className="bg-surface border border-white/[0.06] rounded-xl p-4 space-y-3">
+        <p className="text-xs text-muted font-bold uppercase tracking-wider">Add Puzzle</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted mb-1 block">Start word</label>
+            <input value={form.start} onChange={e => setForm(f => ({ ...f, start: e.target.value }))}
+              placeholder="COLD" className="input w-full text-sm font-mono" />
+          </div>
+          <div>
+            <label className="text-xs text-muted mb-1 block">Target word</label>
+            <input value={form.target} onChange={e => setForm(f => ({ ...f, target: e.target.value }))}
+              placeholder="WARM" className="input w-full text-sm font-mono" />
+          </div>
+          <div>
+            <label className="text-xs text-muted mb-1 block">Steps</label>
+            <input type="number" min="1" value={form.steps} onChange={e => setForm(f => ({ ...f, steps: e.target.value }))}
+              placeholder="4" className="input w-full text-sm" />
+          </div>
+          <div>
+            <label className="text-xs text-muted mb-1 block">Solution (space-separated)</label>
+            <input value={form.solution} onChange={e => setForm(f => ({ ...f, solution: e.target.value }))}
+              placeholder="COLD CORD WORD WARD WARM" className="input w-full text-sm font-mono" />
+          </div>
+        </div>
+        <button onClick={addPuzzle} disabled={adding || !form.start.trim() || !form.target.trim() || !form.steps}
+          className="btn btn-primary text-sm disabled:opacity-40">
+          {adding ? 'Adding…' : 'Add Puzzle'}
+        </button>
+      </div>
+
+      <div className="bg-surface border border-white/[0.06] rounded-xl p-4 space-y-3">
+        <p className="text-xs text-muted font-bold uppercase tracking-wider">Bulk Import (CSV)</p>
+        <p className="text-xs text-muted">Each row: <span className="text-amber font-mono">start,target,steps,WORD1 WORD2 WORD3</span></p>
+        <label className="btn btn-secondary text-sm cursor-pointer w-fit">
+          📂 Choose CSV <input type="file" accept=".csv,.txt" onChange={handleCSVFile} className="hidden" />
+        </label>
+        {csvPreview && (
+          <div className="space-y-3">
+            <div className="flex gap-4 text-xs">
+              <span className="text-muted">Parsed: <strong className="text-text">{csvPreview.all.length}</strong></span>
+              <span className="text-muted">New: <strong className="text-amber">{csvPreview.newOnes.length}</strong></span>
+              <span className="text-muted">Dupes: <strong className="text-muted/60">{csvPreview.all.length - csvPreview.newOnes.length}</strong></span>
+            </div>
+            {csvPreview.newOnes.length > 0 ? (
+              <div className="bg-navy border border-white/[0.06] rounded-xl p-3 max-h-28 overflow-y-auto space-y-1">
+                {csvPreview.newOnes.slice(0, 10).map((p, i) => (
+                  <div key={i} className="text-xs font-mono text-amber">{p.start} → {p.target} ({p.steps} steps)</div>
+                ))}
+                {csvPreview.newOnes.length > 10 && <div className="text-xs text-muted">+{csvPreview.newOnes.length - 10} more</div>}
+              </div>
+            ) : <p className="text-xs text-muted italic">All puzzles already exist.</p>}
+            <div className="flex gap-2">
+              {csvPreview.newOnes.length > 0 && (
+                <button onClick={importPuzzles} disabled={importing} className="btn btn-primary text-sm disabled:opacity-40">
+                  {importing ? 'Importing…' : `Import ${csvPreview.newOnes.length} Puzzles`}
+                </button>
+              )}
+              <button onClick={() => setCsvPreview(null)} className="btn btn-secondary text-sm">Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Word Library sub-editor: Spelling Bee puzzles ─────────────────────────────
+function SpellingBeeEditor() {
+  const [puzzles, setPuzzles]   = useState([]);
+  const [loading, setLoading]   = useState(false);
+  const [adding, setAdding]     = useState(false);
+  const [csvPreview, setCsvPreview] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [form, setForm]         = useState({ center: '', letters: '', pangram: '', words: '' });
+
+  useEffect(() => { load(); }, []);
+
+  async function load() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('spellingbee_data').select('*').order('pangram', { ascending: true }).limit(500);
+    setLoading(false);
+    if (error) { toast.error('Failed to load'); return; }
+    setPuzzles(data || []);
+  }
+
+  async function addPuzzle() {
+    const { center, letters, pangram, words } = form;
+    if (!center.trim() || !letters.trim() || !pangram.trim()) return;
+    const lettersArr = letters.toUpperCase().split(/[\s,]+/).filter(Boolean);
+    const wordsArr   = words.toUpperCase().split(/[\s,]+/).filter(Boolean);
+    setAdding(true);
+    const { error } = await supabase.from('spellingbee_data').insert({
+      center:  center.toUpperCase().trim().charAt(0),
+      letters: lettersArr,
+      pangram: pangram.toUpperCase().trim(),
+      words:   wordsArr,
+    });
+    setAdding(false);
+    if (error) toast.error(error.code === '23505' ? 'Pangram already exists' : error.message);
+    else { toast.success('Added!'); setForm({ center: '', letters: '', pangram: '', words: '' }); await load(); }
+  }
+
+  async function deletePuzzle(id) {
+    const { error } = await supabase.from('spellingbee_data').delete().eq('id', id);
+    if (error) toast.error('Failed to delete');
+    else setPuzzles(prev => prev.filter(p => p.id !== id));
+  }
+
+  function handleCSVFile(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const existing = new Set(puzzles.map(p => p.pangram));
+      const parsed = ev.target.result.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean).map(line => {
+        const parts   = line.split(',');
+        const center  = (parts[0] || '').trim().toUpperCase().charAt(0);
+        const letters = (parts[1] || '').trim().toUpperCase().split(/\s+/).filter(Boolean);
+        const pangram = (parts[2] || '').trim().toUpperCase();
+        const words   = (parts[3] || '').trim().toUpperCase().split(/\s+/).filter(Boolean);
+        if (!center || !pangram) return null;
+        return { center, letters, pangram, words };
+      }).filter(Boolean);
+      const newOnes = parsed.filter(p => !existing.has(p.pangram));
+      setCsvPreview({ all: parsed, newOnes });
+    };
+    reader.readAsText(file); e.target.value = '';
+  }
+
+  async function importPuzzles() {
+    if (!csvPreview?.newOnes?.length) return;
+    setImporting(true);
+    for (const row of csvPreview.newOnes) {
+      await supabase.from('spellingbee_data').insert(row);
+    }
+    toast.success(`Imported ${csvPreview.newOnes.length} puzzles!`);
+    setCsvPreview(null); setImporting(false); await load();
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-amber/10 text-amber border border-amber/20 whitespace-nowrap">
+          {puzzles.length} puzzles
+        </span>
+      </div>
+
+      <div className="bg-surface border border-white/[0.06] rounded-xl overflow-hidden">
+        {loading ? <div className="p-8 text-center text-muted text-sm">Loading…</div>
+          : puzzles.length === 0 ? <div className="p-8 text-center text-muted text-sm">No puzzles yet — add some below</div>
+          : (
+            <>
+              <div className="grid grid-cols-[48px_1fr_1fr_36px] gap-3 px-4 py-2 border-b border-white/[0.06] text-xs font-bold text-muted uppercase tracking-wider">
+                <span>Center</span><span>Letters</span><span>Pangram</span><span></span>
+              </div>
+              <div className="max-h-64 overflow-y-auto divide-y divide-white/[0.04]">
+                {puzzles.map(p => (
+                  <div key={p.id} className="grid grid-cols-[48px_1fr_1fr_36px] gap-3 px-4 py-2.5 items-center hover:bg-white/[0.02] group">
+                    <span className="text-sm font-mono text-amber font-bold">{p.center}</span>
+                    <span className="text-xs font-mono text-muted">{Array.isArray(p.letters) ? p.letters.join(' ') : p.letters}</span>
+                    <span className="text-xs font-mono text-text">{p.pangram}</span>
+                    <button onClick={() => deletePuzzle(p.id)} className="text-xs text-red/40 hover:text-red group-hover:text-red/60 transition-colors duration-150 text-center">✕</button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+      </div>
+
+      <div className="bg-surface border border-white/[0.06] rounded-xl p-4 space-y-3">
+        <p className="text-xs text-muted font-bold uppercase tracking-wider">Add Puzzle</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted mb-1 block">Center letter</label>
+            <input value={form.center} onChange={e => setForm(f => ({ ...f, center: e.target.value }))}
+              placeholder="T" maxLength={1} className="input w-full text-sm font-mono" />
+          </div>
+          <div>
+            <label className="text-xs text-muted mb-1 block">Outer letters (space-separated)</label>
+            <input value={form.letters} onChange={e => setForm(f => ({ ...f, letters: e.target.value }))}
+              placeholder="A B C H U N" className="input w-full text-sm font-mono" />
+          </div>
+          <div>
+            <label className="text-xs text-muted mb-1 block">Pangram</label>
+            <input value={form.pangram} onChange={e => setForm(f => ({ ...f, pangram: e.target.value }))}
+              placeholder="UNHATCHED" className="input w-full text-sm font-mono" />
+          </div>
+          <div>
+            <label className="text-xs text-muted mb-1 block">Valid words (space-separated)</label>
+            <input value={form.words} onChange={e => setForm(f => ({ ...f, words: e.target.value }))}
+              placeholder="ACHE ACHED CATCH HATCH…" className="input w-full text-sm font-mono" />
+          </div>
+        </div>
+        <button onClick={addPuzzle} disabled={adding || !form.center.trim() || !form.pangram.trim()}
+          className="btn btn-primary text-sm disabled:opacity-40">
+          {adding ? 'Adding…' : 'Add Puzzle'}
+        </button>
+      </div>
+
+      <div className="bg-surface border border-white/[0.06] rounded-xl p-4 space-y-3">
+        <p className="text-xs text-muted font-bold uppercase tracking-wider">Bulk Import (CSV)</p>
+        <p className="text-xs text-muted">Each row: <span className="text-amber font-mono">center, L1 L2 L3 L4 L5 L6, PANGRAM, WORD1 WORD2…</span></p>
+        <label className="btn btn-secondary text-sm cursor-pointer w-fit">
+          📂 Choose CSV <input type="file" accept=".csv,.txt" onChange={handleCSVFile} className="hidden" />
+        </label>
+        {csvPreview && (
+          <div className="space-y-3">
+            <div className="flex gap-4 text-xs">
+              <span className="text-muted">Parsed: <strong className="text-text">{csvPreview.all.length}</strong></span>
+              <span className="text-muted">New: <strong className="text-amber">{csvPreview.newOnes.length}</strong></span>
+              <span className="text-muted">Dupes: <strong className="text-muted/60">{csvPreview.all.length - csvPreview.newOnes.length}</strong></span>
+            </div>
+            {csvPreview.newOnes.length > 0 ? (
+              <div className="bg-navy border border-white/[0.06] rounded-xl p-3 max-h-28 overflow-y-auto space-y-1">
+                {csvPreview.newOnes.slice(0, 10).map((p, i) => (
+                  <div key={i} className="text-xs font-mono text-amber">{p.center} — {p.pangram}</div>
+                ))}
+                {csvPreview.newOnes.length > 10 && <div className="text-xs text-muted">+{csvPreview.newOnes.length - 10} more</div>}
+              </div>
+            ) : <p className="text-xs text-muted italic">All puzzles already exist.</p>}
+            <div className="flex gap-2">
+              {csvPreview.newOnes.length > 0 && (
+                <button onClick={importPuzzles} disabled={importing} className="btn btn-primary text-sm disabled:opacity-40">
+                  {importing ? 'Importing…' : `Import ${csvPreview.newOnes.length} Puzzles`}
+                </button>
+              )}
+              <button onClick={() => setCsvPreview(null)} className="btn btn-secondary text-sm">Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Word Library top-level (tab router) ───────────────────────────────────────
+function WordLibrary() {
+  const [activeTab, setActiveTab] = useState('Wordle');
+  const activeGame = WORD_GAMES.find(g => g.label === activeTab);
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <div className="flex gap-1.5 flex-wrap">
+        {LIBRARY_TABS.map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-[background,color] duration-150
+              ${activeTab === tab
+                ? 'bg-amber/15 text-amber border border-amber/30'
+                : 'text-muted hover:text-text border border-white/[0.08] bg-surface'}`}>
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {activeGame  && <WordGameEditor key={activeGame.id} game={activeGame} />}
+      {activeTab === 'Word Ladder'  && <WordLadderEditor />}
+      {activeTab === 'Spelling Bee' && <SpellingBeeEditor />}
     </motion.div>
   );
 }
