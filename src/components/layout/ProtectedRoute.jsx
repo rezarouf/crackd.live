@@ -20,7 +20,11 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (adminOnly && profile?.role !== 'admin') {
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
+  const isAdmin = profile?.role === 'admin' ||
+    user?.email?.trim().toLowerCase() === ADMIN_EMAIL?.trim().toLowerCase();
+
+  if (adminOnly && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
