@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,6 +17,10 @@
 
   body {
     @apply bg-navy text-text font-sans antialiased;
+    background-image:
+      repeating-linear-gradient(rgba(255,255,255,0.03) 0px, transparent 1px, transparent 59px, rgba(255,255,255,0.03) 60px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 59px, rgba(255,255,255,0.03) 60px);
+    background-size: 60px 60px;
   }
 
   ::-webkit-scrollbar {
@@ -66,9 +72,9 @@
   .surface-float    { @apply bg-surface-2; }
 
   /* Amber glow utilities */
-  .glow-amber-sm { box-shadow: 0 0 12px rgba(245,166,35,0.15); }
-  .glow-amber-md { box-shadow: 0 0 24px rgba(245,166,35,0.20); }
-  .glow-amber-lg { box-shadow: 0 0 40px rgba(245,166,35,0.30); }
+  .glow-amber-sm { box-shadow: 0 0 12px rgba(232,160,32,0.15); }
+  .glow-amber-md { box-shadow: 0 0 24px rgba(232,160,32,0.20); }
+  .glow-amber-lg { box-shadow: 0 0 40px rgba(232,160,32,0.30); }
 
   /* Button base */
   .btn {
@@ -80,10 +86,10 @@
 
   .btn-primary {
     @apply btn bg-amber text-navy hover:bg-amber-dim;
-    box-shadow: 0 0 20px rgba(245,166,35,0.25);
+    box-shadow: 0 0 20px rgba(232,160,32,0.25);
   }
   .btn-primary:hover {
-    box-shadow: 0 0 28px rgba(245,166,35,0.35);
+    box-shadow: 0 0 28px rgba(232,160,32,0.35);
   }
 
   .btn-secondary {

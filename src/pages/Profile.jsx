@@ -107,9 +107,23 @@ export default function ProfilePage() {
 
   const tabs = ['Overview', 'Games', 'Achievements'];
 
+  const joinedDate = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : null;
+
   return (
     <div className="min-h-screen bg-navy pt-20 pb-24 px-4">
       <div className="max-w-2xl mx-auto">
+
+        {/* Page title */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 26 }}
+          className="pt-6 pb-8"
+        >
+          <p className="label-eyebrow mb-2">Profile</p>
+          <h1 className="text-[clamp(32px,5vw,48px)] font-black tracking-[-0.04em]">Your Record</h1>
+        </motion.div>
 
         {/* Profile header */}
         <motion.div
@@ -183,7 +197,7 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-bold" style={{ color: level.color }}>{level.title}</span>
                 <span className="text-muted text-xs">·</span>
                 <span className="text-muted text-xs font-mono">{formatNumber(xp)} XP</span>
@@ -194,6 +208,9 @@ export default function ProfilePage() {
                   </>
                 )}
               </div>
+              {joinedDate && (
+                <p className="text-xs text-muted/50 font-medium mb-2">Sharp since {joinedDate}</p>
+              )}
 
               {/* XP progress bar */}
               <div className="space-y-1">
@@ -217,10 +234,10 @@ export default function ProfilePage() {
 
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <StatCard label="Total XP"     value={formatNumber(xp)}            Icon={Star}       />
-          <StatCard label="Day Streak"   value={`${streak}d`}                Icon={Flame}      />
-          <StatCard label="Today"        value={`${daily.completedCount}/${GAMES_META.length}`} Icon={CalendarDays} />
-          <StatCard label="Games Played" value={gamesPlayed === null ? '…' : formatNumber(gamesPlayed)} Icon={Gamepad2} />
+          <StatCard label="Total XP"        value={formatNumber(xp)}            Icon={Star}       />
+          <StatCard label="Current Streak"  value={`${streak}d`}                Icon={Flame}      />
+          <StatCard label="Days Active"     value={gamesPlayed === null ? '…' : formatNumber(gamesPlayed)} Icon={CalendarDays} />
+          <StatCard label="Global Rank"     value="#—"                          Icon={Gamepad2}   />
         </div>
 
         {/* Tabs */}
@@ -245,7 +262,7 @@ export default function ProfilePage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             {/* Daily progress */}
             <div className="bg-surface border border-white/[0.06] rounded-2xl p-5">
-              <h3 className="font-bold text-sm mb-4">Today's Progress</h3>
+              <h3 className="font-bold text-sm mb-4">Today's Set</h3>
               <div className="grid grid-cols-5 gap-2">
                 {GAMES_META.map(game => {
                   const done = isCompletedToday(game.id);
@@ -279,7 +296,7 @@ export default function ProfilePage() {
 
             {/* Game streaks */}
             <div className="bg-surface border border-white/[0.06] rounded-2xl p-5">
-              <h3 className="font-bold text-sm mb-4">Game Streaks</h3>
+              <h3 className="font-bold text-sm mb-4">Recent Set History</h3>
               <div className="space-y-2">
                 {GAMES_META.slice(0, 5).map(game => {
                   const gameStreak = streaks[game.id] || 0;
@@ -335,7 +352,13 @@ export default function ProfilePage() {
 
         {/* Tab: Achievements */}
         {activeTab === 'Achievements' && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 gap-3">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-xs font-bold uppercase tracking-widest text-muted/60">Earned</span>
+              <div className="flex-1 h-px bg-white/[0.05]" />
+              <span className="text-xs text-muted/50 tabular-nums">{userAchievements.length} / {ACHIEVEMENTS.length}</span>
+            </div>
+            <div className="grid grid-cols-1 gap-3">
             {ACHIEVEMENTS.map(a => {
               const unlocked = userAchievements.includes(a.id);
               return (
@@ -356,6 +379,7 @@ export default function ProfilePage() {
                 </div>
               );
             })}
+            </div>
           </motion.div>
         )}
 

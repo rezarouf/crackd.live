@@ -178,11 +178,8 @@ function EmptyState({ game, period }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
       <div className="text-5xl mb-4">🏆</div>
-      <p className="font-black text-lg text-text mb-1">No scores yet</p>
-      <p className="text-sm text-muted">
-        Be the first on the {game === 'all' ? '' : GAMES.find(g => g.id === game)?.label + ' '}
-        leaderboard for {period.toLowerCase()}!
-      </p>
+      <p className="font-black text-lg text-text mb-2">Nothing here yet.</p>
+      <p className="text-sm text-muted">Go earn it.</p>
     </div>
   );
 }
@@ -261,10 +258,10 @@ export default function LeaderboardPage() {
             transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.06 }}
             className="text-[clamp(36px,7vw,56px)] font-black tracking-[-0.04em] mb-3"
           >
-            Global Leaderboard
+            The Board
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.12 }}
-            className="text-muted">Top puzzle solvers from around the world</motion.p>
+            className="text-muted">Ranked by consistency.</motion.p>
         </div>
 
         {/* Period tabs */}
@@ -302,7 +299,14 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Podium — hidden while loading */}
-        {!loading && players.length > 0 && <Podium players={players} />}
+        {!loading && players.length > 0 && (
+          <>
+            <p className="text-center text-xs font-bold uppercase tracking-widest text-muted/50 mb-6">
+              Today's sharpest minds
+            </p>
+            <Podium players={players} />
+          </>
+        )}
 
         {/* List */}
         {loading ? (

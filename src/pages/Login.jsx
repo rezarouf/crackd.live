@@ -72,8 +72,8 @@ export default function LoginPage() {
           }}
         >
           <div className="mb-8">
-            <h1 className="text-2xl font-black tracking-snug mb-1.5">Welcome back</h1>
-            <p className="text-muted text-sm">Log in to continue your streak</p>
+            <h1 className="text-2xl font-black tracking-snug mb-1.5">Welcome back.</h1>
+            <p className="text-muted text-sm">Your daily set is waiting.</p>
           </div>
 
           {/* Google OAuth */}

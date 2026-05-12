@@ -33,7 +33,7 @@ const GAME_ICONS = {
   logoguess: Tag,
 };
 
-const FILTERS = ['All', 'Word & Number', 'Visual'];
+const FILTERS = ['All', 'Mental Agility', 'Pattern Recognition'];
 
 export default function GamesPage() {
   const navigate = useNavigate();
@@ -42,8 +42,8 @@ export default function GamesPage() {
 
   const wordGames   = GAMES_META.filter(g => g.type === 'word');
   const visualGames = GAMES_META.filter(g => g.type === 'visual');
-  const showWord    = filter !== 'Visual';
-  const showVisual  = filter !== 'Word & Number';
+  const showWord    = filter !== 'Pattern Recognition';
+  const showVisual  = filter !== 'Mental Agility';
 
   const totalDone = GAMES_META.filter(g => isCompletedToday(g.id)).length;
 
@@ -69,7 +69,7 @@ export default function GamesPage() {
               transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.04 }}
               className="text-[clamp(36px,6vw,60px)] font-black tracking-[-0.04em] leading-none"
             >
-              Game Lobby
+              Today's Set
             </motion.h1>
 
             {/* Today's progress */}
@@ -131,7 +131,7 @@ export default function GamesPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="mb-16"
             >
-              <SectionHeader label="Word & Number" count={wordGames.length} />
+              <SectionHeader label="Mental Agility" count={wordGames.length} />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {wordGames.map((g, i) => (
                   <GameCard key={g.id} game={g} index={i} done={isCompletedToday(g.id)} navigate={navigate} />
@@ -148,7 +148,7 @@ export default function GamesPage() {
               key="visual"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             >
-              <SectionHeader label="Visual Puzzles" count={visualGames.length} />
+              <SectionHeader label="Pattern Recognition" count={visualGames.length} />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {visualGames.map((g, i) => (
                   <GameCard key={g.id} game={g} index={i} done={isCompletedToday(g.id)} navigate={navigate} />
@@ -208,8 +208,8 @@ function GameCard({ game, index, done, navigate }) {
 
       {/* Done badge */}
       {done && (
-        <div className="absolute top-4 right-4 w-6 h-6 rounded-full bg-green/15 border border-green/30 flex items-center justify-center">
-          <span className="text-[11px] text-green font-black">✓</span>
+        <div className="absolute top-4 right-4 px-2 py-0.5 rounded-full bg-green/12 border border-green/25 flex items-center justify-center">
+          <span className="text-[10px] text-green font-black tracking-wide uppercase">Done</span>
         </div>
       )}
 
@@ -245,12 +245,16 @@ function GameCard({ game, index, done, navigate }) {
             <span className="text-[12px] text-muted/70 font-mono">+{game.xp}</span>
           </div>
 
-          <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-navy font-black text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-            style={{ background: 'linear-gradient(135deg, #F5A623, #FFB84D)' }}
-          >
-            →
-          </div>
+          {done ? (
+            <span className="text-[11px] font-bold text-muted/50 uppercase tracking-wide">Tomorrow</span>
+          ) : (
+            <div
+              className="px-3 h-8 rounded-xl flex items-center justify-center text-navy font-black text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              style={{ background: 'linear-gradient(135deg, #E8A020, #FFB84D)' }}
+            >
+              Begin
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

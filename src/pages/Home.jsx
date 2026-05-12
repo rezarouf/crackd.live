@@ -77,18 +77,15 @@ export default function HomePage() {
         <motion.h1 {...s(1)}
           className="text-[clamp(52px,9vw,92px)] font-black leading-[0.96] tracking-[-0.04em] mb-6 max-w-4xl"
         >
-          Crack the Puzzle.
+          Your daily set
           <br />
-          <span className="text-amber" style={{ textShadow: '0 0 80px rgba(245,166,35,0.5)' }}>
-            Beat the Clock.
+          <span className="text-amber" style={{ textShadow: '0 0 80px rgba(232,160,32,0.5)' }}>
+            is ready.
           </span>
-          <br />
-          Beat the World.
         </motion.h1>
 
         <motion.p {...s(2)} className="text-[18px] text-muted max-w-lg mx-auto leading-relaxed mb-10">
-          10 fresh daily challenges. Real-time global leaderboards.<br />
-          XP, streaks, and bragging rights — every single day.
+          10 challenges. Once each. That's the deal.
         </motion.p>
 
         {/* CTA buttons */}
@@ -102,7 +99,7 @@ export default function HomePage() {
               boxShadow: '0 0 0 1px rgba(245,166,35,0.3), 0 8px 32px rgba(245,166,35,0.35), 0 2px 8px rgba(245,166,35,0.2)',
             }}
           >
-            Play Today's Challenges →
+            Start Today's Set →
           </motion.button>
           <motion.button
             whileTap={{ scale: 0.96 }}
@@ -110,7 +107,7 @@ export default function HomePage() {
             className="text-text font-semibold text-base px-8 py-3.5 rounded-2xl border border-white/10 hover:border-white/20 transition-[border-color] duration-200"
             style={{ background: 'rgba(255,255,255,0.04)' }}
           >
-            Global Rankings
+            See The Board
           </motion.button>
         </motion.div>
 
@@ -126,7 +123,7 @@ export default function HomePage() {
               ))}
             </div>
             <span className="text-sm font-semibold text-muted">
-              <span className="text-amber font-black">{completedCount}</span>/10 today
+              <span className="text-amber font-black">{completedCount}</span> of 10 completed today
             </span>
           </motion.div>
         )}
@@ -181,7 +178,7 @@ export default function HomePage() {
           <div className="mb-14">
             <motion.p
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="label-eyebrow mb-3">Today's Lineup</motion.p>
+              className="label-eyebrow mb-3">Today's Set</motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.05 }}
@@ -194,7 +191,7 @@ export default function HomePage() {
           {/* Word games row */}
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-5">
-              <span className="text-xs font-bold uppercase tracking-widest text-muted/60">Word & Number</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-muted/60">Mental Agility</span>
               <div className="flex-1 h-px bg-white/[0.05]" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -207,7 +204,7 @@ export default function HomePage() {
           {/* Visual games row */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <span className="text-xs font-bold uppercase tracking-widest text-muted/60">Visual Puzzles</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-muted/60">Pattern Recognition</span>
               <div className="flex-1 h-px bg-white/[0.05]" />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -305,8 +302,8 @@ export default function HomePage() {
                 className="text-muted text-lg mb-10"
               >
                 {completedCount === 10
-                  ? "All 10 puzzles done. Check back tomorrow for a new set."
-                  : `${10 - completedCount} puzzle${10 - completedCount !== 1 ? 's' : ''} remaining today. Don't break the chain.`}
+                  ? "Complete all 10 — prove your consistency."
+                  : `${10 - completedCount} puzzle${10 - completedCount !== 1 ? 's' : ''} remaining. Don't break the chain.`}
               </motion.p>
               <motion.button
                 initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
@@ -331,7 +328,7 @@ export default function HomePage() {
                 transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.06 }}
                 className="text-[clamp(36px,6vw,60px)] font-black tracking-[-0.04em] mb-5"
               >
-                Start your streak<br />today.
+                Start today.<br />One game at a time.
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}

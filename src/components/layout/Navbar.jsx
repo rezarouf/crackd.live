@@ -10,8 +10,8 @@ import { Flame, User, Trophy, LogOut } from 'lucide-react';
 import { supabase } from '../../lib/supabase.js';
 
 const NAV_LINKS = [
-  { to: '/games',       label: 'Games'       },
-  { to: '/leaderboard', label: 'Leaderboard' },
+  { to: '/games',       label: "Today's Set"  },
+  { to: '/leaderboard', label: 'The Board'    },
 ];
 
 export default function Navbar() {
@@ -59,8 +59,9 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 hover:opacity-90 transition-opacity duration-150">
-            <LogoMark iconSize={34} />
+          <Link to="/" className="flex-shrink-0 hover:opacity-90 transition-opacity duration-150 flex flex-col items-start leading-none">
+            <span className="font-display font-black text-base tracking-tight text-text">CRACKD.LIVE</span>
+            <span className="text-[9px] font-mono text-muted/60 tracking-widest uppercase mt-0.5 hidden sm:block">Daily mental reset</span>
           </Link>
 
           {/* Center nav — desktop */}
@@ -185,8 +186,8 @@ export default function Navbar() {
                         {/* Menu items */}
                         <div className="py-1.5">
                           {[
-                            { label: 'Profile', Icon: User, to: '/profile' },
-                            { label: 'Leaderboard', Icon: Trophy, to: '/leaderboard' },
+                            { label: 'Your Record', Icon: User, to: '/profile' },
+                            { label: 'The Board', Icon: Trophy, to: '/leaderboard' },
                           ].map(({ label, Icon, to }) => (
                             <button
                               key={to}
