@@ -1,64 +1,33 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Share2, HelpCircle, Flame } from 'lucide-react';
 import { HowToPlay, useHowToPlay } from './HowToPlay.jsx';
 import HintSolveBar from './HintSolveBar.jsx';
 import { toast } from './Toast.jsx';
 
-// ─── Share helpers ────────────────────────────────────────────────────────────
-
-/**
- * Build a share string and copy it to the clipboard.
- *
- * shareData shape (all fields optional):
- *   gameName   {string}   — displayed on first line
- *   emojiGrid  {string}   — pre-built emoji grid (e.g. from Wordle rows)
- *   score      {number}   — numeric score shown when no emojiGrid supplied
- *   maxScore   {number}   — shown alongside score as "score / maxScore"
- *   guesses    {number}   — "X guesses" line
- *   maxGuesses {number}   — shown alongside guesses
- *   time       {string}   — time string (e.g. "1:23")
- *   won        {boolean}  — appends ✓ or ✗ indicator
- *   extra      {string}   — any extra free-form line
- *   rows       {Array}    — Wordle-style row objects { states: string[] }
- *                           auto-converted to emoji grid when emojiGrid absent
- */
-const STATE_EMOJI = {
-  correct: '🟧',
-  present: '🟦',
-  absent:  '⬛',
-};
+// ── Share helpers ──────────────────────────────────────────────────────────────
+const STATE_EMOJI = { correct: '🟧', present: '🟦', absent: '⬛' };
 
 function buildShareText(gameName, shareData = {}) {
-  const {
-    emojiGrid, rows, score, maxScore, guesses, maxGuesses,
-    time, won, extra,
-  } = shareData;
-
+  const { emojiGrid, rows, score, maxScore, guesses, maxGuesses, time, won, extra } = shareData;
   const lines = [`Crackd.live — ${gameName}`];
-
-  // Auto-build emoji grid from Wordle-style row objects if no grid supplied
   const grid = emojiGrid ?? (
     rows?.filter(r => r.states?.length)
          .map(r => r.states.map(s => STATE_EMOJI[s] ?? '⬛').join(''))
          .join('\n')
   );
-
-  if (grid) {
-    lines.push(grid);
-  } else {
-    // Fallback: score / guesses / time as text
+  if (grid) { lines.push(grid); }
+  else {
     const parts = [];
-    if (score !== undefined)   parts.push(maxScore !== undefined ? `${score}/${maxScore}` : String(score));
-    if (guesses !== undefined) parts.push(maxGuesses !== undefined ? `${guesses}/${maxGuesses} guesses` : `${guesses} guesses`);
-    if (time !== undefined)    parts.push(`⏱ ${time}`);
-    if (won !== undefined)     parts.push(won ? '✓' : '✗');
+    if (score    !== undefined) parts.push(maxScore    !== undefined ? `${score}/${maxScore}`       : String(score));
+    if (guesses  !== undefined) parts.push(maxGuesses  !== undefined ? `${guesses}/${maxGuesses} guesses` : `${guesses} guesses`);
+    if (time     !== undefined) parts.push(`⏱ ${time}`);
+    if (won      !== undefined) parts.push(won ? '✓' : '✗');
     if (parts.length) lines.push(parts.join('  ·  '));
   }
-
   if (extra) lines.push(extra);
   lines.push('Play at crackd.live');
-
   return lines.join('\n');
 }
 
@@ -66,10 +35,7 @@ export function useShareResult(gameName) {
   return useCallback((shareData = {}) => {
     const text = buildShareText(gameName, shareData);
     if (navigator.share) {
-      navigator.share({ text }).catch(() => {
-        // User cancelled or API unavailable — fall back to clipboard
-        copyToClipboard(text);
-      });
+      navigator.share({ text }).catch(() => copyToClipboard(text));
     } else {
       copyToClipboard(text);
     }
@@ -78,26 +44,64 @@ export function useShareResult(gameName) {
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text)
-    .then(() => toast.success('Copied to clipboard! 📋'))
+    .then(() => toast.success('Copied to clipboard!'))
     .catch(() => toast.error('Could not copy — please copy manually'));
 }
 
-// ─── Shell ────────────────────────────────────────────────────────────────────
+// ── Animated checkmark ─────────────────────────────────────────────────────────
+function AnimatedCheck() {
+  return (
+    <div className="relative w-20 h-20 mx-auto mb-8">
+      {/* Outer glow ring */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: 'rgba(16,185,129,0.10)',
+          border: '1px solid rgba(16,185,129,0.25)',
+          animation: 'pulseGlow 2.5s ease-in-out infinite',
+        }}
+      />
+      {/* Inner circle */}
+      <div
+        className="absolute inset-2 rounded-full flex items-center justify-center"
+        style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.20)' }}
+      >
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+          <polyline
+            points="8,20 17,29 32,11"
+            stroke="#10B981"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="100"
+            style={{ animation: 'drawCheck 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both' }}
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
 
-/**
- * Shared wrapper for all game pages.
- * Handles header, HowToPlay modal, optional Hint/Solve bar, and share button.
- *
- * Extra props:
- *   onHint      – () => void   (omit to hide)
- *   onSolve     – () => void   (omit to hide)
- *   hintsUsed   – number
- *   wasSolved   – bool
- *   hintLabel   – string       (e.g. "Reveal a letter")
- *   gameOver    – bool         (disables hint/solve when true)
- *   shareData   – object       (see useShareResult / buildShareText for shape)
- *                              when provided, a share button appears in the header
- */
+// ── Loading skeleton ───────────────────────────────────────────────────────────
+export function GameShellSkeleton() {
+  return (
+    <div className="min-h-screen flex flex-col items-center pb-24 pt-4" style={{ background: '#080909' }}>
+      <div className="w-full max-w-lg px-4 pb-4 mb-6 flex items-center justify-between"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="skeleton w-8 h-8 rounded-lg" />
+        <div className="skeleton w-32 h-5 rounded" />
+        <div className="skeleton w-8 h-8 rounded-lg" />
+      </div>
+      <div className="w-full max-w-lg px-4 space-y-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="skeleton h-14 rounded-2xl" style={{ animationDelay: `${i * 80}ms` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Shell ──────────────────────────────────────────────────────────────────────
 export default function GameShell({
   gameId, title, right, badge, children, maxWidth = 'max-w-lg',
   onHint = null, onSolve = null,
@@ -107,53 +111,75 @@ export default function GameShell({
   result = null,
   xpEarned = 0,
   isLastGame = false,
+  streak = 0,
 }) {
-  const navigate   = useNavigate();
-  const htp        = useHowToPlay();
-  const shareResult = useShareResult(title);
+  const navigate     = useNavigate();
+  const htp          = useHowToPlay();
+  const shareResult  = useShareResult(title);
+  const [copied, setCopied] = useState(false);
 
   const handleShare = useCallback(() => {
     shareResult(shareData ?? {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }, [shareResult, shareData]);
 
   return (
-    <div className="min-h-screen bg-navy flex flex-col items-center pb-24 pt-4">
+    <div className="min-h-screen flex flex-col items-center pb-24 pt-4" style={{ background: '#080909' }}>
       {htp.open && <HowToPlay gameId={gameId} onClose={htp.hide} />}
 
-      {/* Header */}
-      <div className={`w-full ${maxWidth} flex items-center justify-between px-4 pb-4 border-b border-white/[0.06] mb-6`}>
+      {/* ── Header ── */}
+      <div
+        className={`w-full ${maxWidth} flex items-center justify-between px-4 pb-4 mb-6`}
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        {/* Back */}
         <button
           onClick={() => navigate('/games')}
-          className="text-muted hover:text-text text-sm font-medium transition-colors duration-150"
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-muted transition-[color,background-color] duration-150"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#FAFAFA'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
         >
-          ← Back
+          <ArrowLeft size={16} />
         </button>
 
+        {/* Center */}
         <div className="flex flex-col items-center gap-0.5">
-          <span className="font-black text-lg tracking-snug">{title}</span>
+          <span className="font-display font-bold text-lg text-text tracking-snug">{title}</span>
           {badge && <span className="text-xs text-muted">{badge}</span>}
+          {streak > 0 && (
+            <div className="flex items-center gap-1 mt-0.5">
+              <Flame size={11} className="text-amber" />
+              <span className="text-[11px] font-black text-amber">{streak}d streak</span>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Right actions */}
+        <div className="flex items-center gap-1.5">
           {right}
-
-          {/* Share button — only shown when shareData is provided or game is over */}
           {(shareData !== null || gameOver) && (
             <button
               onClick={handleShare}
-              className="w-8 h-8 rounded-lg border text-muted hover:text-amber transition-[color,border-color] duration-150 flex items-center justify-center text-base"
-              style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-muted transition-[color,border-color] duration-150"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
               title="Share your result"
+              onMouseEnter={e => { e.currentTarget.style.color = '#F0B429'; e.currentTarget.style.borderColor = 'rgba(240,180,41,0.25)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
             >
-              📤
+              <Share2 size={15} />
             </button>
           )}
-
           <button
             onClick={htp.show}
-            className="w-8 h-8 rounded-lg border text-muted hover:text-text text-sm font-bold transition-[color,border-color] duration-150 flex items-center justify-center"
-            style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}
-          >?</button>
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-muted transition-[color,border-color] duration-150"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#FAFAFA'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+          >
+            <HelpCircle size={15} />
+          </button>
         </div>
       </div>
 
@@ -168,81 +194,113 @@ export default function GameShell({
         disabled={gameOver}
       />
 
-      {/* Result overlay */}
+      {/* ── Result overlay ── */}
       <AnimatePresence>
         {result && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: 'rgba(13,15,20,0.88)', backdropFilter: 'blur(20px)' }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6"
+            style={{ background: 'rgba(8,9,9,0.90)', backdropFilter: 'blur(24px)' }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 20 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 28, delay: 0.05 }}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 40, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28, delay: 0.06 }}
               className="w-full max-w-sm text-center"
               style={{
-                background: '#161B25',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 24,
-                padding: '36px 32px',
-                boxShadow: '0 24px 64px rgba(0,0,0,0.7), 0 4px 16px rgba(0,0,0,0.4)',
+                background: '#0F1117',
+                border: '1px solid rgba(255,255,255,0.09)',
+                borderRadius: 20,
+                padding: '36px 28px 28px',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.8), 0 4px 20px rgba(0,0,0,0.5)',
               }}
             >
               {result === 'win' ? (
                 <>
-                  <div className="w-16 h-16 rounded-full bg-green/12 border border-green/25 flex items-center justify-center mx-auto mb-6">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <h2 className="text-[42px] font-black tracking-[-0.04em] text-text leading-none mb-2">Sharp.</h2>
-                  <p className="text-muted text-[15px] mb-7">
+                  <AnimatedCheck />
+                  <motion.h2
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                    className="font-display font-bold text-gradient-gold mb-2"
+                    style={{ fontSize: 52, letterSpacing: '-0.04em', lineHeight: 1 }}
+                  >
+                    Sharp.
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    transition={{ delay: 0.45 }}
+                    className="text-muted text-[15px] mb-6"
+                  >
                     {isLastGame ? 'Full set. Come back stronger.' : 'See you tomorrow.'}
-                  </p>
+                  </motion.p>
                 </>
               ) : (
                 <>
-                  <div className="w-16 h-16 rounded-full bg-red/10 border border-red/20 flex items-center justify-center mx-auto mb-6">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  <div className="w-20 h-20 mx-auto mb-8 rounded-full flex items-center justify-center"
+                    style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.18)' }}>
+                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                      <line x1="10" y1="10" x2="30" y2="30" stroke="#F43F5E" strokeWidth="3.5" strokeLinecap="round" />
+                      <line x1="30" y1="10" x2="10" y2="30" stroke="#F43F5E" strokeWidth="3.5" strokeLinecap="round" />
                     </svg>
                   </div>
-                  <h2 className="text-[42px] font-black tracking-[-0.04em] text-text leading-none mb-2">Not today.</h2>
-                  <p className="text-muted text-[15px] mb-7">Tomorrow's another shot.</p>
+                  <h2 className="font-display font-bold text-text mb-2"
+                    style={{ fontSize: 48, letterSpacing: '-0.04em', lineHeight: 1 }}>
+                    Not today.
+                  </h2>
+                  <p className="text-muted text-[15px] mb-6">Tomorrow's another shot.</p>
                 </>
               )}
 
-              {xpEarned > 0 && (
-                <div className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl mb-6"
-                  style={{ background: 'rgba(232,160,32,0.08)', border: '1px solid rgba(232,160,32,0.15)' }}>
-                  <span className="text-sm text-muted font-medium">Earned today</span>
-                  <span className="text-amber font-black text-base">+{xpEarned} XP</span>
-                </div>
-              )}
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="space-y-2.5 mb-7"
+              >
+                {xpEarned > 0 && (
+                  <div className="flex items-center justify-between px-4 py-3 rounded-xl"
+                    style={{ background: 'rgba(240,180,41,0.07)', border: '1px solid rgba(240,180,41,0.14)' }}>
+                    <span className="text-sm text-muted font-medium">Earned today</span>
+                    <span className="font-black text-amber text-base">+{xpEarned} XP</span>
+                  </div>
+                )}
+              </motion.div>
 
-              <div className="flex flex-col gap-2.5">
+              {/* Actions */}
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="flex flex-col gap-2.5"
+              >
                 {shareData !== null && (
                   <button
                     onClick={handleShare}
-                    className="w-full py-3 rounded-xl text-sm font-bold border transition-[border-color,color] duration-150 text-muted hover:text-text"
-                    style={{ borderColor: 'rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}
+                    className="w-full py-3 rounded-xl text-sm font-semibold transition-[border-color,color,background-color] duration-150"
+                    style={{
+                      background: copied ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${copied ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.10)'}`,
+                      color: copied ? '#10B981' : '#94A3B8',
+                    }}
                   >
-                    Share your result
+                    {copied ? 'Copied! ✓' : 'Share your result'}
                   </button>
                 )}
                 <button
                   onClick={() => navigate('/games')}
-                  className="w-full py-3.5 rounded-xl text-sm font-black text-navy transition-opacity duration-150 hover:opacity-90"
-                  style={{ background: 'linear-gradient(135deg, #E8A020, #FFB84D)', boxShadow: '0 0 24px rgba(232,160,32,0.25)' }}
+                  className="w-full py-3.5 rounded-xl text-sm font-black text-inverse transition-opacity duration-150 hover:opacity-90"
+                  style={{
+                    background: '#F0B429',
+                    boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 4px 20px rgba(240,180,41,0.20)',
+                  }}
                 >
                   Next challenge →
                 </button>
-              </div>
+              </motion.div>
             </motion.div>
           </motion.div>
         )}

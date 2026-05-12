@@ -1,9 +1,9 @@
+// Re-export new logo from canonical source
+export { LogoMark, LogoIcon } from '../LogoMark.jsx';
+
 /**
- * Brand-accurate logo components for Crackd.live
- * Based on official brand guidelines 2026.
- *
- * HexBolt  — Variation 3 (preferred abstract mark): hex lightning bolt icon
- * LogoMark — Variation 2: icon + wordmark (for nav, product UI)
+ * Legacy components kept for backward compatibility.
+ * New code should import from src/components/LogoMark.jsx directly.
  */
 
 /** Hex lightning bolt — the preferred standalone mark */

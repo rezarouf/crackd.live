@@ -3,7 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore.js';
 import { toast } from '../components/ui/Toast.jsx';
-import { LogoMark } from '../components/ui/Logo.jsx';
+import { LogoMark } from '../components/LogoMark.jsx';
+import { Zap, Target, Calendar } from 'lucide-react';
+
+const FEATURES = [
+  { Icon: Calendar, text: 'Once a day. Build the habit.' },
+  { Icon: Target,   text: 'Compete globally. Own your rank.' },
+  { Icon: Zap,      text: '10 games. Zero fluff.' },
+];
 
 export default function SignupPage() {
   const [username, setUsername] = useState('');
@@ -28,59 +35,98 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-navy flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex" style={{ background: '#080909' }}>
 
-      {/* Layered glows */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[700px] h-[500px]"
-          style={{ background: 'radial-gradient(ellipse, rgba(74,158,255,0.1) 0%, transparent 65%)' }} />
-        <div className="absolute bottom-0 right-[15%] w-[400px] h-[300px]"
-          style={{ background: 'radial-gradient(ellipse, rgba(245,166,35,0.07) 0%, transparent 70%)' }} />
-      </div>
-
-      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
-
-      <svg className="absolute inset-0 w-full h-full opacity-[0.02] pointer-events-none">
-        <filter id="noise-signup">
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
-          <feColorMatrix type="saturate" values="0"/>
-        </filter>
-        <rect width="100%" height="100%" filter="url(#noise-signup)" />
-      </svg>
-
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-        className="w-full max-w-[400px] relative z-10"
+      {/* ── Left brand panel (desktop only) ── */}
+      <div
+        className="hidden lg:flex flex-col justify-between w-[42%] flex-shrink-0 p-12 relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(160deg, #0F1117 0%, #080909 60%, #080D0F 100%)',
+          borderRight: '1px solid rgba(255,255,255,0.06)',
+        }}
       >
-        {/* Logo */}
-        <div className="flex justify-center mb-10">
-          <LogoMark iconSize={38} />
+        {/* Ambient */}
+        <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.09) 0%, transparent 65%)' }} />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[300px] h-[300px] pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse, rgba(240,180,41,0.07) 0%, transparent 65%)' }} />
+
+        <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
+
+        <div className="relative z-10">
+          <LogoMark size={40} showTagline />
         </div>
 
-        <div
-          className="rounded-3xl p-8 border"
-          style={{
-            background: 'rgba(22,27,37,0.9)',
-            borderColor: 'rgba(255,255,255,0.07)',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)',
-            backdropFilter: 'blur(20px)',
-          }}
+        <div className="relative z-10">
+          <h2
+            className="font-display font-bold text-text mb-3"
+            style={{ fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1.15 }}
+          >
+            Join the ones who<br />
+            <span className="text-gradient-gold">show up daily.</span>
+          </h2>
+          <p className="text-muted text-base mb-10 leading-relaxed">
+            One set a day. Every day. Build your streak.
+          </p>
+
+          <div className="space-y-4">
+            {FEATURES.map(({ Icon, text }, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center gap-3"
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(240,180,41,0.10)', border: '1px solid rgba(240,180,41,0.20)' }}>
+                  <Icon size={15} className="text-amber" />
+                </div>
+                <span className="text-sm text-muted font-medium">{text}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <p className="relative z-10 text-xs text-tertiary">
+          © 2025 Crackd.live · Free forever
+        </p>
+      </div>
+
+      {/* ── Right form panel ── */}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] lg:hidden pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.07) 0%, transparent 65%)' }} />
+        <div className="absolute inset-0 grid-bg opacity-[0.25] pointer-events-none lg:hidden" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-[380px] relative z-10"
         >
+          {/* Mobile logo */}
+          <div className="flex justify-center mb-10 lg:hidden">
+            <LogoMark size={36} />
+          </div>
+
           <div className="mb-8">
-            <h1 className="text-2xl font-black tracking-snug mb-1.5">Join the sharp ones.</h1>
+            <h1 className="font-display font-bold text-text mb-1.5"
+              style={{ fontSize: 28, letterSpacing: '-0.03em' }}>
+              Join the sharp ones.
+            </h1>
             <p className="text-muted text-sm">One set a day. Every day. Build your streak.</p>
           </div>
 
-          {/* Google OAuth */}
+          {/* Google */}
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={signInWithGoogle}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border text-sm font-semibold text-text mb-6 transition-[border-color,background-color] duration-150"
-            style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';  e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl text-sm font-semibold text-text mb-6 transition-[border-color,background-color] duration-150"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)';  e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
           >
             <svg style={{ width: 18, height: 18, flexShrink: 0 }} viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -91,60 +137,46 @@ export default function SignupPage() {
             Join with Google
           </motion.button>
 
+          {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-white/[0.07]" />
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
             <span className="text-xs text-muted/50 font-medium">or email</span>
-            <div className="flex-1 h-px bg-white/[0.07]" />
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
           </div>
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-muted/70 mb-2 uppercase tracking-wider">Username</label>
+              <label className="block text-xs font-bold text-muted/60 mb-2 uppercase tracking-wider">Username</label>
               <input
-                type="text"
-                value={username}
-                onChange={e => setUsername(e.target.value.replace(/\s/g, ''))}
-                placeholder="CipherKing99"
-                required
-                minLength={3}
-                maxLength={20}
+                type="text" value={username} onChange={e => setUsername(e.target.value.replace(/\s/g, ''))}
+                placeholder="CipherKing99" required minLength={3} maxLength={20}
                 className="input"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-muted/70 mb-2 uppercase tracking-wider">Email</label>
+              <label className="block text-xs font-bold text-muted/60 mb-2 uppercase tracking-wider">Email</label>
               <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                autoComplete="email"
+                type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com" required autoComplete="email"
                 className="input"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-muted/70 mb-2 uppercase tracking-wider">Password</label>
+              <label className="block text-xs font-bold text-muted/60 mb-2 uppercase tracking-wider">Password</label>
               <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Min. 6 characters"
-                required
-                minLength={6}
-                autoComplete="new-password"
+                type="password" value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="Min. 6 characters" required minLength={6} autoComplete="new-password"
                 className="input"
               />
             </div>
 
             <motion.button
-              type="submit"
-              disabled={loading}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-3.5 rounded-xl font-black text-navy text-sm mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              type="submit" disabled={loading} whileTap={{ scale: 0.98 }}
+              className="w-full py-3.5 rounded-xl font-bold text-inverse text-sm mt-1 transition-opacity duration-150 disabled:opacity-50"
               style={{
-                background: 'linear-gradient(135deg, #F5A623 0%, #FFB84D 100%)',
-                boxShadow: '0 0 24px rgba(245,166,35,0.3), 0 2px 8px rgba(245,166,35,0.2)',
+                background: '#F0B429',
+                boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 4px 16px rgba(240,180,41,0.20)',
               }}
             >
               {loading ? (
@@ -155,22 +187,21 @@ export default function SignupPage() {
                   </svg>
                   Creating account…
                 </span>
-              ) : 'Create Account — It\'s Free'}
+              ) : "Create Account — It's Free"}
             </motion.button>
           </form>
 
-          <p className="text-center text-xs text-muted/50 mt-5 leading-relaxed">
+          <p className="text-center text-xs text-muted/40 mt-5 leading-relaxed">
             By signing up you agree to the rules of good sportsmanship.
           </p>
-
           <p className="text-center text-sm text-muted mt-4">
             Already have an account?{' '}
-            <Link to="/login" className="text-amber font-bold hover:text-amber/80 transition-colors duration-150">
+            <Link to="/login" className="text-amber font-bold hover:opacity-80 transition-opacity duration-150">
               Log in
             </Link>
           </p>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }
