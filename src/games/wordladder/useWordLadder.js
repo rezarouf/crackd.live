@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { WORD_LADDER_PUZZLES, VALID_4_LETTER_WORDS } from './wordladderData.js';
 import { seededRandom, getTodaySeed, formatTime, calcXP, applyHintPenalty } from '../../lib/utils.js';
 import { useGameStore } from '../../store/gameStore.js';
 import { useAuthStore } from '../../store/authStore.js';
-import { saveGameResult } from '../../lib/supabase.js';
+import { supabase, saveGameResult } from '../../lib/supabase.js';
 
 function getDailyPuzzle() {
   const rng = seededRandom(getTodaySeed() + 'wordladder');
@@ -33,7 +33,7 @@ function bfsNextStep(from, to, wordSet) {
         const next = word.slice(0, i) + String.fromCharCode(c) + word.slice(i + 1);
         if (next === word) continue;
         if (next === to) return path.length >= 1 ? path[1] || to : to;
-        if (wordSet.has(next.toLowerCase()) && !visited.has(next)) {
+        if ((wordSet.has(next) || wordSet.has(next.toLowerCase())) && !visited.has(next)) {
           visited.add(next);
           queue.push([...path, next]);
         }
@@ -54,9 +54,21 @@ export function useWordLadder() {
   const [hintsUsed, setHintsUsed] = useState(0);
   const [wasSolved, setWasSolved] = useState(false);
   const [hintWord, setHintWord] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const wordSetRef = useRef(VALID_4_LETTER_WORDS); // replaced after Supabase fetch
 
   const { submitResult, markComplete } = useGameStore();
   const { user } = useAuthStore();
+
+  useEffect(() => {
+    supabase.from('wordladder_valid_words').select('word').then(({ data, error: err }) => {
+      if (!err && data && data.length > 0) {
+        wordSetRef.current = new Set(data.map(r => r.word.toUpperCase()));
+      }
+      setLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     if (gameOver) return;
@@ -79,7 +91,7 @@ export function useWordLadder() {
     if (word.length !== 4) { setError('Must be 4 letters'); return; }
     const last = chain[chain.length - 1];
     if (!differsBy1(word, last)) { setError('Must differ by exactly 1 letter'); setTimeout(() => setError(''), 2000); return; }
-    if (!VALID_4_LETTER_WORDS.has(word.toLowerCase())) { setError('Not a valid word'); setTimeout(() => setError(''), 2000); return; }
+    if (!wordSetRef.current.has(word)) { setError('Not a valid word'); setTimeout(() => setError(''), 2000); return; }
     if (chain.includes(word)) { setError('Already used!'); setTimeout(() => setError(''), 2000); return; }
 
     const newChain = [...chain, word];
@@ -94,7 +106,7 @@ export function useWordLadder() {
   const hint = useCallback(() => {
     if (gameOver) return;
     const currentWord = chain[chain.length - 1];
-    const nextWord = bfsNextStep(currentWord, puzzle.end, VALID_4_LETTER_WORDS);
+    const nextWord = bfsNextStep(currentWord, puzzle.end, wordSetRef.current);
     if (!nextWord) return;
     setHintsUsed(h => h + 1);
     setHintWord(nextWord);
@@ -113,6 +125,6 @@ export function useWordLadder() {
   return {
     puzzle, chain, input, setInput, error, won, gameOver,
     time: formatTime(seconds), hintWord, hintsUsed, wasSolved,
-    submit, hint, solve,
+    submit, hint, solve, loading,
   };
 }

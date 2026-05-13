@@ -3,7 +3,7 @@ import { SPELLING_BEE_PUZZLES } from './spellingbeeData.js';
 import { seededRandom, getTodaySeed, formatTime, calcXP, applyHintPenalty } from '../../lib/utils.js';
 import { useGameStore } from '../../store/gameStore.js';
 import { useAuthStore } from '../../store/authStore.js';
-import { saveGameResult } from '../../lib/supabase.js';
+import { supabase, saveGameResult } from '../../lib/supabase.js';
 
 function getDailyPuzzle() {
   const seed = getTodaySeed();
@@ -27,6 +27,9 @@ export function useSpellingBee() {
   const allLetters = [puzzle.center, ...puzzle.letters];
   const validWords = puzzle.words.map(w => w.toUpperCase());
 
+  const [loading, setLoading] = useState(true);
+  const wordSetRef = useRef(new Set(validWords.map(w => w.toLowerCase()))); // replaced after fetch
+
   const [input, setInput] = useState('');
   const [found, setFound] = useState([]);
   const foundSet = useRef(new Set());
@@ -42,6 +45,15 @@ export function useSpellingBee() {
   const { submitResult, isCompletedToday, markComplete } = useGameStore();
   const { user } = useAuthStore();
   const alreadyDone = isCompletedToday('spellingbee');
+
+  useEffect(() => {
+    supabase.from('spellingbee_valid_words').select('word').then(({ data, error: err }) => {
+      if (!err && data && data.length > 0) {
+        wordSetRef.current = new Set(data.map(r => r.word.toLowerCase()));
+      }
+      setLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     if (!timerActive || gameOver) return;
@@ -92,7 +104,7 @@ export function useSpellingBee() {
     if (!center || !word.split('').includes(center)) { showMsg('Missing center letter!'); return; }
     if (!word.split('').every(l => allLetters.map(a => a.toUpperCase()).includes(l))) { showMsg('Bad letters!'); return; }
     if (foundSet.current.has(word)) { showMsg('Already found!'); return; }
-    if (!validWords.includes(word)) { showMsg('Not in word list'); return; }
+    if (!wordSetRef.current.has(word.toLowerCase())) { showMsg('Not in word list'); return; }
 
     foundSet.current.add(word);
     const pts = scoreWord(word, puzzle.pangram);
@@ -147,7 +159,7 @@ export function useSpellingBee() {
   return {
     puzzle, allLetters, found, score, maxScore, input, message, gameOver,
     time: formatTime(seconds), rank: getRank(),
-    hintsUsed, wasSolved,
+    hintsUsed, wasSolved, loading,
     addLetter, deleteLetter, clearInput, submit, hint, solve, alreadyDone,
   };
 }
