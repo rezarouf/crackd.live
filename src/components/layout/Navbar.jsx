@@ -21,12 +21,10 @@ export default function Navbar() {
   const [mobileOpen,  setMobileOpen]  = useState(false);
   const [navHeight,   setNavHeight]   = useState(72);
   const { user, profile, signOut }   = useAuthStore();
-  const { streaks }                   = useGameStore();
+  const { overallStreak }              = useGameStore();
   const { completedCount, totalGames } = useDailyChallenge();
   const navigate  = useNavigate();
   const location  = useLocation();
-
-  const overallStreak = Math.max(0, ...Object.values(streaks));
   const xp    = profile?.xp || 0;
   const level = getLevelInfo(xp);
 

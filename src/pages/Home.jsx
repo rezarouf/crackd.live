@@ -30,7 +30,7 @@ const LEADERBOARD_PREVIEW = [
 const TICKER_ITEMS = [
   '12,847 players active',
   'Top streak: 94 days',
-  '10 games daily',
+  '21 games daily',
   'New puzzles at midnight UTC',
   'Free forever',
   '500+ XP available today',
@@ -312,7 +312,7 @@ export default function HomePage() {
               ))}
             </div>
             <span className="text-sm font-semibold text-muted">
-              <span className="text-lime font-black">{completedCount}</span> of 10 completed today
+              <span className="text-lime font-black">{completedCount}</span> of {GAMES_META.length} completed today
             </span>
           </motion.div>
         )}
@@ -358,7 +358,7 @@ export default function HomePage() {
               className="font-display font-bold text-text"
               style={{ fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '-0.03em' }}
             >
-              10 Puzzles. One Perfect Score.
+              {GAMES_META.length} Puzzles. One Perfect Score.
             </motion.h2>
           </div>
 
@@ -369,7 +369,7 @@ export default function HomePage() {
               className="mb-10 px-2"
             >
               <div className="flex items-center justify-between text-sm mb-3">
-                <span className="text-muted font-medium">{completedCount} of 10 complete</span>
+                <span className="text-muted font-medium">{completedCount} of {GAMES_META.length} complete</span>
                 {completedCount === 10 && (
                   <span className="text-lime font-bold text-xs">Full house! Come back tomorrow.</span>
                 )}
@@ -506,7 +506,7 @@ export default function HomePage() {
               >
                 {completedCount === 10
                   ? 'Complete all 10 — prove your consistency.'
-                  : `${10 - completedCount} puzzle${10 - completedCount !== 1 ? 's' : ''} remaining. Don't break the chain.`}
+                  : `${GAMES_META.length - completedCount} puzzle${GAMES_META.length - completedCount !== 1 ? 's' : ''} remaining. Don't break the chain.`}
               </motion.p>
               <motion.button
                 initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}

@@ -185,7 +185,7 @@ export default function GamesPage() {
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="label-eyebrow mb-3">
-            10 Games
+            {GAMES_META.length} Games
           </motion.p>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
             <motion.h1
@@ -213,7 +213,7 @@ export default function GamesPage() {
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-black text-amber">{totalDone}</span>
-                  <span className="text-muted font-bold">/10</span>
+                  <span className="text-muted font-bold">/{GAMES_META.length}</span>
                 </div>
               </motion.div>
             )}

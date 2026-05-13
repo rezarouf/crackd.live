@@ -9,7 +9,7 @@ import { Zap, Target, Calendar } from 'lucide-react';
 const FEATURES = [
   { Icon: Calendar, text: 'Once a day. Build the habit.' },
   { Icon: Target,   text: 'Compete globally. Own your rank.' },
-  { Icon: Zap,      text: '10 games. Zero fluff.' },
+  { Icon: Zap,      text: '21 games. Zero fluff.' },
 ];
 
 export default function LoginPage() {
