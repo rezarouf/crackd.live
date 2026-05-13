@@ -141,28 +141,78 @@ function AppInner() {
 
   const globalFallback = (
     <div style={{
-      background: '#0D0F14',
+      background: '#0E0E14',
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '16px',
-      fontFamily: 'Inter, sans-serif',
+      gap: '20px',
+      fontFamily: "'Space Grotesk', sans-serif",
     }}>
-      <style>{`@keyframes crackd-pulse{0%,100%{opacity:.7;transform:scale(.97)}50%{opacity:1;transform:scale(1)}}`}</style>
-      <div style={{
-        fontSize: '2rem',
-        fontWeight: 900,
-        letterSpacing: '-0.03em',
-        color: '#F5A623',
-        animation: 'crackd-pulse 1.4s ease-in-out infinite',
-      }}>
-        CRACKD.L<span style={{ color: '#F5A623' }}>⚡</span>VE
+      <style>{`
+        @keyframes loader-crack-draw { from { stroke-dashoffset: 80; opacity: 0; } to { stroke-dashoffset: 0; opacity: 0.9; } }
+        @keyframes loader-hex-pulse  { 0%,100% { opacity: 0.6; transform: scale(0.97); } 50% { opacity: 1; transform: scale(1); } }
+        @keyframes loader-fade-up    { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes loader-dot        { 0%,80%,100% { opacity: 0.2; transform: scale(0.7); } 40% { opacity: 1; transform: scale(1); } }
+      `}</style>
+
+      {/* Animated logo mark */}
+      <svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+        style={{ animation: 'loader-hex-pulse 2s ease-in-out infinite' }}>
+        <defs>
+          <filter id="ldr-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <linearGradient id="ldr-lime" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#C8F55A" />
+            <stop offset="100%" stopColor="#D4FF6B" />
+          </linearGradient>
+        </defs>
+        {/* Hex shell */}
+        <polygon points="50,8 91,28 91,72 50,92 9,72 9,28"
+          fill="#18181F" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
+        <polygon points="50,15 86,32 86,68 50,85 14,68 14,32"
+          fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+        {/* C letter */}
+        <path d="M 63,33 A 20,20 0 1 0 63,67"
+          stroke="#F0EEE6" strokeWidth="9" strokeLinecap="round" fill="none" opacity="0.9" />
+        {/* Crack bloom */}
+        <line x1="45" y1="27" x2="59" y2="73"
+          stroke="#C8F55A" strokeWidth="7" strokeLinecap="round" opacity="0.07" />
+        {/* Crack main — animates in */}
+        <line x1="45" y1="27" x2="59" y2="73"
+          stroke="url(#ldr-lime)" strokeWidth="2.5" strokeLinecap="round"
+          strokeDasharray="80" filter="url(#ldr-glow)"
+          style={{ animation: 'loader-crack-draw 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both' }} />
+        <line x1="45" y1="27" x2="51" y2="37"
+          stroke="url(#ldr-lime)" strokeWidth="1.5" strokeLinecap="round"
+          strokeDasharray="80" filter="url(#ldr-glow)"
+          style={{ animation: 'loader-crack-draw 0.5s cubic-bezier(0.22,1,0.36,1) 0.55s both' }} />
+        <line x1="59" y1="63" x2="53" y2="73"
+          stroke="url(#ldr-lime)" strokeWidth="1.5" strokeLinecap="round"
+          strokeDasharray="80" filter="url(#ldr-glow)"
+          style={{ animation: 'loader-crack-draw 0.5s cubic-bezier(0.22,1,0.36,1) 0.7s both' }} />
+      </svg>
+
+      {/* Wordmark */}
+      <div style={{ animation: 'loader-fade-up 0.5s ease 0.2s both', textAlign: 'center' }}>
+        <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1 }}>
+          <span style={{ color: '#F0EEE6' }}>CRACKD</span>
+          <span style={{ color: '#C8F55A' }}>.LIVE</span>
+        </div>
       </div>
-      <span style={{ fontSize: '13px', color: '#8B95A1', fontWeight: 500, letterSpacing: '0.04em' }}>
-        Loading...
-      </span>
+
+      {/* Loading dots */}
+      <div style={{ display: 'flex', gap: '6px', animation: 'loader-fade-up 0.4s ease 0.4s both' }}>
+        {[0, 1, 2].map(i => (
+          <div key={i} style={{
+            width: 5, height: 5, borderRadius: '50%', background: '#C8F55A',
+            animation: `loader-dot 1.4s ease-in-out ${i * 0.16}s infinite`,
+          }} />
+        ))}
+      </div>
     </div>
   );
 

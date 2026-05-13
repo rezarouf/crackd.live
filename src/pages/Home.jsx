@@ -1,11 +1,27 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
-import { ArrowRight, Flame } from 'lucide-react';
-import { GAMES_META } from '../lib/constants.js';
+import {
+  ArrowRight, Flame,
+  Type, Grid3X3, Hash, Lock, Grid, Settings2, MapPin, GitBranch,
+  Layers, Wrench, AlignLeft, LayoutGrid, ArrowUpDown, Workflow,
+  Droplets, Cpu, Bomb, GitMerge, MessageCircle, Gamepad2, Tag,
+} from 'lucide-react';
+import { GAMES_META, DIFF_COLOR } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
 import { useAuthStore } from '../store/authStore.js';
 import { getLevelInfo } from '../lib/utils.js';
+import { supabase } from '../lib/supabase.js';
+
+const GAME_ICONS = {
+  wordle: Type, connections: Grid3X3, nerdle: Hash, cryptogram: Lock,
+  sudoku: Grid, screw: Settings2, pinpull: MapPin, rope: GitBranch,
+  woodblock: Layers, nutsbolts: Wrench, spellingbee: AlignLeft,
+  nonogram: LayoutGrid, wordladder: ArrowUpDown, flow: Workflow,
+  watersort: Droplets, tilerotation: Cpu, minesweeper: Bomb,
+  merge: GitMerge, emojiphrase: MessageCircle, twentyfortyeight: Gamepad2,
+  logoguess: Tag,
+};
 
 // ── Animation helpers ──────────────────────────────────────────────────────────
 const fadeUp = (delay = 0) => ({
@@ -19,13 +35,6 @@ const fadeIn = (delay = 0) => ({
   animate: { opacity: 1 },
   transition: { delay, duration: 0.4 },
 });
-
-// ── Static data ────────────────────────────────────────────────────────────────
-const LEADERBOARD_PREVIEW = [
-  { rank: 1, username: 'xCipherKing',  country: '🇺🇸', xp: 9840, streak: 94 },
-  { rank: 2, username: 'PuzzlrPro',    country: '🇬🇧', xp: 9210, streak: 67 },
-  { rank: 3, username: 'GridMaster9',  country: '🇩🇪', xp: 8755, streak: 51 },
-];
 
 const TICKER_ITEMS = [
   '12,847 players active',
@@ -43,7 +52,7 @@ const VISUAL_GAMES = GAMES_META.filter(g => g.type === 'visual');
 
 // ── Subtitle word-by-word animation ───────────────────────────────────────────
 function AnimatedSubtitle() {
-  const words = ['Ten', 'challenges.', 'Once', 'each.', 'Every', 'day.'];
+  const words = ['21', 'challenges.', 'Once', 'each.', 'Every', 'day.'];
   return (
     <p className="text-lg sm:text-xl text-muted leading-relaxed">
       {words.map((word, i) => (
@@ -84,6 +93,8 @@ function Ticker() {
 // ── Mini game card ─────────────────────────────────────────────────────────────
 function MiniCard({ game, index, isCompleted, navigate }) {
   const [hovered, setHovered] = useState(false);
+  const Icon = GAME_ICONS[game.id];
+  const diffColor = DIFF_COLOR[game.difficulty] || '#7A7A8C';
   return (
     <motion.button
       initial={{ opacity: 0, y: 20 }}
@@ -93,34 +104,58 @@ function MiniCard({ game, index, isCompleted, navigate }) {
       onClick={() => navigate(game.route)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative flex flex-col items-center gap-3 p-5 text-center group"
+      className="relative flex flex-col overflow-hidden text-left"
       style={{
-        background: isCompleted
-          ? 'rgba(200,245,90,0.05)'
-          : hovered
-          ? 'rgba(255,255,255,0.04)'
-          : 'rgba(24,24,31,0.7)',
-        border: `1px solid ${isCompleted ? 'rgba(200,245,90,0.22)' : hovered ? 'rgba(200,245,90,0.18)' : 'rgba(255,255,255,0.06)'}`,
+        background: isCompleted ? 'rgba(200,245,90,0.04)' : hovered ? 'rgba(24,24,31,1)' : 'rgba(24,24,31,0.85)',
+        border: `1px solid ${isCompleted ? 'rgba(200,245,90,0.22)' : hovered ? 'rgba(200,245,90,0.18)' : 'rgba(255,255,255,0.07)'}`,
         borderRadius: 16,
-        boxShadow: hovered && !isCompleted ? '0 0 24px rgba(200,245,90,0.08), 0 4px 20px rgba(0,0,0,0.3)' : 'none',
+        boxShadow: hovered && !isCompleted ? '0 0 24px rgba(200,245,90,0.08), 0 6px 24px rgba(0,0,0,0.35)' : '0 2px 12px rgba(0,0,0,0.2)',
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
       }}
     >
+      {/* Top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{
+        background: game.type === 'word'
+          ? `linear-gradient(90deg, transparent, ${diffColor}55, transparent)`
+          : `linear-gradient(90deg, transparent, rgba(166,124,255,0.4), transparent)`,
+        opacity: hovered ? 1 : 0.4,
+        transition: 'opacity 0.2s ease',
+      }} />
+      {/* Watermark */}
+      <div className="absolute -right-2 -bottom-2 opacity-[0.05] pointer-events-none">
+        {Icon && <Icon size={60} />}
+      </div>
+      {/* Done badge */}
       {isCompleted && (
         <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center"
           style={{ background: 'rgba(200,245,90,0.12)', border: '1px solid rgba(200,245,90,0.25)' }}>
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-            <polyline points="2,6 5,9 10,3" stroke="#C8F55A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+            <polyline points="2,6 5,9 10,3" stroke="#C8F55A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       )}
-      <span className="text-3xl" style={{ transform: hovered ? 'scale(1.12)' : 'scale(1)', transition: 'transform 0.2s ease' }}>
-        {game.icon}
-      </span>
-      <div>
-        <p className="text-[13px] font-bold text-text leading-tight">{game.name}</p>
-        <p className="text-[11px] text-muted mt-0.5 font-mono">+{game.xp} XP</p>
+      <div className="p-4 flex flex-col gap-3">
+        {/* Icon */}
+        <div className="relative w-9 h-9">
+          <div className="absolute inset-0 rounded-lg opacity-40" style={{
+            background: `radial-gradient(circle, ${diffColor}30 0%, transparent 70%)`,
+            filter: 'blur(4px)',
+            transform: hovered ? 'scale(1.3)' : 'scale(1)',
+            transition: 'transform 0.25s ease',
+          }} />
+          <div className="relative w-9 h-9 rounded-lg flex items-center justify-center" style={{
+            background: `${diffColor}12`, border: `1px solid ${diffColor}25`,
+            transform: hovered ? 'scale(1.08)' : 'scale(1)', transition: 'transform 0.2s ease',
+          }}>
+            {Icon && <Icon size={17} color={diffColor} strokeWidth={1.8} />}
+          </div>
+        </div>
+        {/* Name + XP */}
+        <div>
+          <p className="text-[13px] font-bold text-text leading-tight tracking-snug">{game.name}</p>
+          <p className="text-[11px] text-muted/60 font-mono mt-0.5">+{game.xp} XP</p>
+        </div>
       </div>
     </motion.button>
   );
@@ -170,8 +205,18 @@ export default function HomePage() {
   const { isCompletedToday } = useGameStore();
   const { profile, user, loading } = useAuthStore();
   const [arrowHovered, setArrowHovered] = useState(false);
+  const [lbPlayers, setLbPlayers] = useState([]);
   const lbRef = useRef(null);
   const lbInView = useInView(lbRef, { once: true });
+
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('username, xp, overall_streak')
+      .order('xp', { ascending: false })
+      .limit(3)
+      .then(({ data }) => { if (data) setLbPlayers(data); });
+  }, []);
 
   const xp    = profile?.xp || 0;
   const level = getLevelInfo(xp);
@@ -437,41 +482,48 @@ export default function HomePage() {
           </div>
 
           <div className="space-y-2">
-            {LEADERBOARD_PREVIEW.map((p, i) => {
-              const medals = ['🥇', '🥈', '🥉'];
-              return (
-                <motion.div
-                  key={p.rank}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={lbInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: i * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-4 px-5 py-4 rounded-2xl transition-[border-color] duration-150"
-                  style={{
-                    background: 'rgba(24,24,31,0.75)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    backdropFilter: 'blur(8px)',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
-                >
-                  <span className="text-xl w-8 text-center flex-shrink-0">{medals[i]}</span>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-lime flex-shrink-0"
-                    style={{ background: 'rgba(200,245,90,0.08)', border: '1px solid rgba(200,245,90,0.15)' }}>
-                    {p.username.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-text truncate">{p.username}</p>
-                    <p className="text-xs text-muted flex items-center gap-1">
-                      {p.country} · <Flame size={10} /> {p.streak}d
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="font-black text-lime tabular-nums">{p.xp.toLocaleString()}</p>
-                    <p className="text-[10px] text-muted font-bold uppercase tracking-wide">XP</p>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {lbPlayers.length === 0
+              ? Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="skeleton h-[72px] rounded-2xl" style={{ animationDelay: `${i * 80}ms` }} />
+                ))
+              : lbPlayers.map((p, i) => {
+                  const medals = ['🥇', '🥈', '🥉'];
+                  const rankColors = ['rgba(200,245,90,0.10)', 'rgba(166,124,255,0.08)', 'rgba(255,144,82,0.08)'];
+                  const rankBorders = ['rgba(200,245,90,0.20)', 'rgba(166,124,255,0.15)', 'rgba(255,144,82,0.15)'];
+                  const textColors = ['#C8F55A', '#A67CFF', '#FF9052'];
+                  return (
+                    <motion.div
+                      key={p.username}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={lbInView ? { opacity: 1, x: 0 } : {}}
+                      transition={{ delay: i * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex items-center gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-[border-color] duration-150"
+                      style={{ background: 'rgba(24,24,31,0.75)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(8px)' }}
+                      onClick={() => navigate('/leaderboard')}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
+                    >
+                      <span className="text-xl w-8 text-center flex-shrink-0">{medals[i]}</span>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0"
+                        style={{ background: rankColors[i], border: `1px solid ${rankBorders[i]}`, color: textColors[i] }}>
+                        {(p.username || '?').slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-text truncate">{p.username}</p>
+                        {p.overall_streak > 0 && (
+                          <p className="text-xs text-muted flex items-center gap-1">
+                            <Flame size={10} /> {p.overall_streak}d streak
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-black tabular-nums" style={{ color: textColors[i] }}>{(p.xp || 0).toLocaleString()}</p>
+                        <p className="text-[10px] text-muted font-bold uppercase tracking-wide">XP</p>
+                      </div>
+                    </motion.div>
+                  );
+                })
+            }
           </div>
         </div>
       </section>
