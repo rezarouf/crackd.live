@@ -30,15 +30,14 @@ async function upsertBatch(table, rows) {
   let inserted = 0;
   for (let i = 0; i < rows.length; i += 100) {
     const chunk = rows.slice(i, i + 100);
-    const { error, count } = await supabase
+    const { error } = await supabase
       .from(table)
-      .upsert(chunk, { onConflict: 'word', ignoreDuplicates: true })
-      .select('word', { count: 'exact', head: true });
+      .insert(chunk, { ignoreDuplicates: true });
     if (error) {
       if (error.code === '42P01') return null; // table missing
-      console.error(`  upsert error (${table}):`, error.message);
+      console.error(`  insert error (${table}):`, error.message);
     } else {
-      inserted += count ?? 0;
+      inserted += chunk.length;
     }
   }
   return inserted;

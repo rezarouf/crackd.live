@@ -1,12 +1,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getDailyWord, getRandomWord, isValidWord, getWordLength } from './wordbank.js';
+import { ANSWER_WORDS, getWordLength } from './wordbank.js';
 import { calcXP, formatTime, applyHintPenalty } from '../../lib/utils.js';
 import { useGameStore } from '../../store/gameStore.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { toast } from '../../components/ui/Toast.jsx';
-import { saveGameResult } from '../../lib/supabase.js';
+import { supabase, saveGameResult } from '../../lib/supabase.js';
 
 const MAX_GUESSES = 6;
+
+const LOCAL_WORD_SET = new Set(ANSWER_WORDS.map(w => w.toUpperCase()));
+
+function pickDailyWord(list) {
+  const parts = new Date().toISOString().slice(0, 10).split('-').map(Number);
+  const seed = parts[0] * 10000 + parts[1] * 100 + parts[2];
+  return list[seed % list.length].toUpperCase();
+}
+
+function pickRandomWord(list) {
+  return list[Math.floor(Math.random() * list.length)].toUpperCase();
+}
 
 function getDailyKey(mode) {
   const today = new Date().toISOString().slice(0, 10);
@@ -20,9 +32,9 @@ function loadSaved(mode) {
   } catch { return null; }
 }
 
-function saveDailyState(mode, state) {
+function saveDailyState(mode, state, targetWord) {
   try {
-    localStorage.setItem(getDailyKey(mode), JSON.stringify(state));
+    localStorage.setItem(getDailyKey(mode), JSON.stringify({ ...state, target: targetWord }));
   } catch {}
 }
 
@@ -41,13 +53,16 @@ function evaluateGuess(guess, target) {
 }
 
 export function useWordle({ mode = 'normal', daily = true }) {
-  const wordLen = getWordLength(mode);
-  const target  = useRef(daily ? getDailyWord(mode) : getRandomWord(mode));
-
+  const wordLen  = getWordLength(mode);
   const savedRef = useRef(daily ? loadSaved(mode) : null);
-  const saved = savedRef.current;
+  const saved    = savedRef.current;
   const isRestored = !!(saved?.rows?.some(r => r.states.length > 0));
 
+  // Initialize from saved target or local fallback; Supabase fetch may update this for fresh games
+  const target     = useRef(daily ? (saved?.target || pickDailyWord(ANSWER_WORDS)) : pickRandomWord(ANSWER_WORDS));
+  const wordSetRef = useRef(LOCAL_WORD_SET); // replaced after successful Supabase fetch
+
+  const [loading, setLoading]       = useState(true);
   const [rows, setRows]             = useState(() => saved?.rows || Array(MAX_GUESSES).fill(null).map(() => ({ letters: [], states: [] })));
   const [currentRow, setCurrentRow] = useState(() => saved?.currentRow ?? 0);
   const [currentInput, setCurrentInput] = useState(() => Array(wordLen).fill(null));
@@ -64,13 +79,27 @@ export function useWordle({ mode = 'normal', daily = true }) {
   const { user } = useAuthStore();
 
   useEffect(() => {
+    supabase.from('wordle_words').select('word').then(({ data, error }) => {
+      if (!error && data && data.length > 0) {
+        const list = data.map(r => r.word.toUpperCase());
+        wordSetRef.current = new Set(list);
+        // Only update target for a fresh daily game (no saved target)
+        if (!saved?.target && daily) {
+          target.current = pickDailyWord(list);
+        }
+      }
+      setLoading(false);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     if (!gameOver) { timerRef.current = setInterval(() => setTime(t => t + 1), 1000); }
     return () => clearInterval(timerRef.current);
   }, [gameOver]);
 
   useEffect(() => {
     if (!daily) return;
-    saveDailyState(mode, { rows, currentRow, gameOver, won, hintsUsed, wasSolved });
+    saveDailyState(mode, { rows, currentRow, gameOver, won, hintsUsed, wasSolved }, target.current);
   }, [rows, currentRow, gameOver, won, hintsUsed, wasSolved, daily, mode]);
 
   const letterStates = {};
@@ -122,7 +151,7 @@ export function useWordle({ mode = 'normal', daily = true }) {
     if (k === 'ENTER') {
       if (currentInput.some(l => l === null)) { setShake(true); setTimeout(() => setShake(false), 400); toast.error('Not enough letters'); return; }
       const guess = currentInput.join('');
-      if (!isValidWord(guess, mode)) { setShake(true); setTimeout(() => setShake(false), 400); toast.error('Not in word list'); return; }
+      if (!wordSetRef.current.has(guess)) { setShake(true); setTimeout(() => setShake(false), 400); toast.error('Not in word list'); return; }
       if (mode !== 'normal') {
         // Collect constraints from all previous rows
         const greenConstraints = {}; // position → letter
@@ -215,7 +244,8 @@ export function useWordle({ mode = 'normal', daily = true }) {
   }, [gameOver, rows, currentRow, hintsUsed]);
 
   const newGame = () => {
-    target.current = getRandomWord(mode);
+    const list = [...wordSetRef.current];
+    target.current = pickRandomWord(list.length ? list : ANSWER_WORDS);
     setRows(Array(MAX_GUESSES).fill(null).map(() => ({ letters: [], states: [] })));
     setCurrentRow(0); setCurrentInput(Array(wordLen).fill(null)); setHintedPositions(new Set());
     setGameOver(false); setWon(false); setTime(0); setHintsUsed(0); setWasSolved(false);
@@ -235,5 +265,6 @@ export function useWordle({ mode = 'normal', daily = true }) {
     time: formatTime(time), letterStates, target: target.current,
     handleKey, getTileState, getTileLetter, newGame, shareResult,
     wordLen, MAX_GUESSES, hintsUsed, wasSolved, hint, solve, isRestored,
+    loading,
   };
 }
