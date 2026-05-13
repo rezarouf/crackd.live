@@ -96,22 +96,22 @@ function MiniCard({ game, index, isCompleted, navigate }) {
       className="relative flex flex-col items-center gap-3 p-5 text-center group"
       style={{
         background: isCompleted
-          ? 'rgba(16,185,129,0.05)'
+          ? 'rgba(200,245,90,0.05)'
           : hovered
           ? 'rgba(255,255,255,0.04)'
-          : 'rgba(22,27,37,0.7)',
-        border: `1px solid ${isCompleted ? 'rgba(16,185,129,0.20)' : hovered ? 'rgba(240,180,41,0.22)' : 'rgba(255,255,255,0.06)'}`,
+          : 'rgba(24,24,31,0.7)',
+        border: `1px solid ${isCompleted ? 'rgba(200,245,90,0.22)' : hovered ? 'rgba(200,245,90,0.18)' : 'rgba(255,255,255,0.06)'}`,
         borderRadius: 16,
-        boxShadow: hovered && !isCompleted ? '0 0 24px rgba(240,180,41,0.08), 0 4px 20px rgba(0,0,0,0.3)' : 'none',
+        boxShadow: hovered && !isCompleted ? '0 0 24px rgba(200,245,90,0.08), 0 4px 20px rgba(0,0,0,0.3)' : 'none',
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
       }}
     >
       {isCompleted && (
         <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.30)' }}>
+          style={{ background: 'rgba(200,245,90,0.12)', border: '1px solid rgba(200,245,90,0.25)' }}>
           <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-            <polyline points="2,6 5,9 10,3" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <polyline points="2,6 5,9 10,3" stroke="#C8F55A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       )}
@@ -147,14 +147,14 @@ function ProgressBar({ value, max }) {
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
         transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        style={{ background: 'linear-gradient(90deg, #F0B429, #F7C948)' }}
+        style={{ background: 'linear-gradient(90deg, #C8F55A, #D4FF6B)' }}
       >
         {pct > 0 && (
           <div
             className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full"
             style={{
-              background: '#F0B429',
-              boxShadow: '0 0 8px rgba(240,180,41,0.8), 0 0 16px rgba(240,180,41,0.4)',
+              background: '#C8F55A',
+              boxShadow: '0 0 8px rgba(200,245,90,0.8), 0 0 16px rgba(200,245,90,0.4)',
               transform: 'translate(50%, -50%)',
             }}
           />
@@ -178,7 +178,7 @@ export default function HomePage() {
   const completedCount = GAMES_META.filter(g => isCompletedToday(g.id)).length;
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: '#080909' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#0E0E14' }}>
 
       {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 overflow-hidden">
@@ -189,24 +189,24 @@ export default function HomePage() {
             className="absolute rounded-full"
             style={{
               top: '-10%', left: '40%', width: 700, height: 500,
-              background: 'radial-gradient(ellipse, rgba(240,180,41,0.14) 0%, transparent 65%)',
-              animation: 'driftGold 18s ease-in-out infinite',
+              background: 'radial-gradient(ellipse, rgba(200,245,90,0.10) 0%, transparent 65%)',
+              animation: 'driftLime 18s ease-in-out infinite',
             }}
           />
           <div
             className="absolute rounded-full"
             style={{
               top: '40%', left: '-5%', width: 500, height: 400,
-              background: 'radial-gradient(ellipse, rgba(59,130,246,0.10) 0%, transparent 65%)',
-              animation: 'driftBlue 22s ease-in-out infinite',
+              background: 'radial-gradient(ellipse, rgba(166,124,255,0.08) 0%, transparent 65%)',
+              animation: 'driftViolet 22s ease-in-out infinite',
             }}
           />
           <div
             className="absolute rounded-full"
             style={{
               top: '20%', right: '-8%', width: 400, height: 350,
-              background: 'radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 65%)',
-              animation: 'driftGold 28s ease-in-out infinite reverse',
+              background: 'radial-gradient(ellipse, rgba(166,124,255,0.06) 0%, transparent 65%)',
+              animation: 'driftLime 28s ease-in-out infinite reverse',
             }}
           />
         </div>
@@ -226,12 +226,12 @@ export default function HomePage() {
         {/* Live badge */}
         <motion.div {...fadeIn(0.1)} className="mb-8">
           <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-pill"
-            style={{ background: 'rgba(240,180,41,0.07)', border: '1px solid rgba(240,180,41,0.18)' }}>
+            style={{ background: 'rgba(200,245,90,0.06)', border: '1px solid rgba(200,245,90,0.15)' }}>
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-lime" />
             </span>
-            <span className="text-[13px] font-bold text-amber tracking-wide">12,847 players online now</span>
+            <span className="text-[13px] font-bold text-lime tracking-wide">12,847 players online now</span>
           </div>
         </motion.div>
 
@@ -261,12 +261,12 @@ export default function HomePage() {
             onMouseLeave={() => setArrowHovered(false)}
             className="flex items-center gap-2.5 font-bold text-inverse px-7 py-3.5 rounded-btn"
             style={{
-              background: '#F0B429',
-              boxShadow: '0 0 0 1px rgba(240,180,41,0.35), 0 4px 20px rgba(240,180,41,0.25)',
+              background: '#C8F55A',
+              boxShadow: '0 0 0 1px rgba(200,245,90,0.35), 0 4px 20px rgba(200,245,90,0.20)',
               fontSize: 15,
             }}
-            onMouseEnterCapture={e => { e.currentTarget.style.background = '#F7C948'; }}
-            onMouseLeaveCapture={e => { e.currentTarget.style.background = '#F0B429'; }}
+            onMouseEnterCapture={e => { e.currentTarget.style.background = '#D4FF6B'; }}
+            onMouseLeaveCapture={e => { e.currentTarget.style.background = '#C8F55A'; }}
           >
             Start Today's Set
             <ArrowRight
@@ -308,11 +308,11 @@ export default function HomePage() {
             <div className="flex gap-1">
               {GAMES_META.map(g => (
                 <div key={g.id} className="w-2 h-2 rounded-full"
-                  style={{ background: isCompletedToday(g.id) ? '#F0B429' : 'rgba(255,255,255,0.12)' }} />
+                  style={{ background: isCompletedToday(g.id) ? '#C8F55A' : 'rgba(255,255,255,0.08)' }} />
               ))}
             </div>
             <span className="text-sm font-semibold text-muted">
-              <span className="text-amber font-black">{completedCount}</span> of 10 completed today
+              <span className="text-lime font-black">{completedCount}</span> of 10 completed today
             </span>
           </motion.div>
         )}
@@ -341,7 +341,7 @@ export default function HomePage() {
       <section className="py-28 px-4 relative">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px]"
-            style={{ background: 'radial-gradient(ellipse, rgba(59,130,246,0.07) 0%, transparent 65%)' }} />
+            style={{ background: 'radial-gradient(ellipse, rgba(166,124,255,0.06) 0%, transparent 65%)' }} />
         </div>
         <div className="max-w-6xl mx-auto relative">
 
@@ -371,7 +371,7 @@ export default function HomePage() {
               <div className="flex items-center justify-between text-sm mb-3">
                 <span className="text-muted font-medium">{completedCount} of 10 complete</span>
                 {completedCount === 10 && (
-                  <span className="text-amber font-bold text-xs">Full house! Come back tomorrow.</span>
+                  <span className="text-lime font-bold text-xs">Full house! Come back tomorrow.</span>
                 )}
               </div>
               <ProgressBar value={completedCount} max={10} />
@@ -404,7 +404,7 @@ export default function HomePage() {
 
           <div className="text-center mt-10">
             <button onClick={() => navigate('/games')}
-              className="text-sm font-semibold text-muted hover:text-amber transition-[color] duration-150">
+              className="text-sm font-semibold text-muted hover:text-lime-hover transition-[color] duration-150">
               View all games →
             </button>
           </div>
@@ -419,7 +419,7 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[500px] h-[400px]"
-            style={{ background: 'radial-gradient(ellipse at right top, rgba(240,180,41,0.07) 0%, transparent 60%)' }} />
+            style={{ background: 'radial-gradient(ellipse at right top, rgba(200,245,90,0.06) 0%, transparent 60%)' }} />
         </div>
         <div className="max-w-2xl mx-auto relative">
           <div className="flex items-end justify-between mb-12">
@@ -447,7 +447,7 @@ export default function HomePage() {
                   transition={{ delay: i * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                   className="flex items-center gap-4 px-5 py-4 rounded-2xl transition-[border-color] duration-150"
                   style={{
-                    background: 'rgba(22,27,37,0.75)',
+                    background: 'rgba(24,24,31,0.75)',
                     border: '1px solid rgba(255,255,255,0.06)',
                     backdropFilter: 'blur(8px)',
                   }}
@@ -455,8 +455,8 @@ export default function HomePage() {
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
                 >
                   <span className="text-xl w-8 text-center flex-shrink-0">{medals[i]}</span>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-amber flex-shrink-0"
-                    style={{ background: 'rgba(240,180,41,0.10)', border: '1px solid rgba(240,180,41,0.15)' }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-lime flex-shrink-0"
+                    style={{ background: 'rgba(200,245,90,0.08)', border: '1px solid rgba(200,245,90,0.15)' }}>
                     {p.username.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -466,7 +466,7 @@ export default function HomePage() {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-black text-amber tabular-nums">{p.xp.toLocaleString()}</p>
+                    <p className="font-black text-lime tabular-nums">{p.xp.toLocaleString()}</p>
                     <p className="text-[10px] text-muted font-bold uppercase tracking-wide">XP</p>
                   </div>
                 </motion.div>
@@ -483,7 +483,7 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[500px]"
-            style={{ background: 'radial-gradient(ellipse, rgba(240,180,41,0.12) 0%, transparent 60%)' }} />
+            style={{ background: 'radial-gradient(ellipse, rgba(200,245,90,0.09) 0%, transparent 60%)' }} />
         </div>
         <div className="max-w-xl mx-auto text-center relative">
           {user ? (
@@ -513,7 +513,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => navigate('/games')}
                 className="font-bold text-inverse text-base px-10 py-4 rounded-btn"
-                style={{ background: '#F0B429', boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 8px 32px rgba(240,180,41,0.25)' }}
+                style={{ background: '#C8F55A', boxShadow: '0 0 0 1px rgba(200,245,90,0.3), 0 8px 32px rgba(200,245,90,0.20)' }}
               >
                 {completedCount === 10 ? 'View All Games →' : 'Continue Playing →'}
               </motion.button>
@@ -543,7 +543,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => navigate('/signup')}
                 className="font-bold text-inverse text-base px-10 py-4 rounded-btn"
-                style={{ background: '#F0B429', boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 8px 32px rgba(240,180,41,0.25)' }}
+                style={{ background: '#C8F55A', boxShadow: '0 0 0 1px rgba(200,245,90,0.3), 0 8px 32px rgba(200,245,90,0.20)' }}
               >
                 Join the sharp ones →
               </motion.button>
@@ -558,7 +558,7 @@ export default function HomePage() {
 function CardSkeleton() {
   return (
     <div className="flex flex-col items-center gap-3 p-5 rounded-2xl"
-      style={{ background: 'rgba(22,27,37,0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
+      style={{ background: 'rgba(24,24,31,0.6)', border: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="skeleton w-10 h-10 rounded-xl" />
       <div className="flex flex-col items-center gap-1.5 w-full">
         <div className="skeleton h-3 w-16 rounded" />

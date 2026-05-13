@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+﻿import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Share2, HelpCircle, Flame } from 'lucide-react';
@@ -6,15 +6,15 @@ import { HowToPlay, useHowToPlay } from './HowToPlay.jsx';
 import HintSolveBar from './HintSolveBar.jsx';
 import { toast } from './Toast.jsx';
 
-// ── Share helpers ──────────────────────────────────────────────────────────────
-const STATE_EMOJI = { correct: '🟧', present: '🟦', absent: '⬛' };
+// â”€â”€ Share helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const STATE_EMOJI = { correct: 'ðŸŸ§', present: 'ðŸŸ¦', absent: 'â¬›' };
 
 function buildShareText(gameName, shareData = {}) {
   const { emojiGrid, rows, score, maxScore, guesses, maxGuesses, time, won, extra } = shareData;
-  const lines = [`Crackd.live — ${gameName}`];
+  const lines = [`Crackd.live â€” ${gameName}`];
   const grid = emojiGrid ?? (
     rows?.filter(r => r.states?.length)
-         .map(r => r.states.map(s => STATE_EMOJI[s] ?? '⬛').join(''))
+         .map(r => r.states.map(s => STATE_EMOJI[s] ?? 'â¬›').join(''))
          .join('\n')
   );
   if (grid) { lines.push(grid); }
@@ -22,9 +22,9 @@ function buildShareText(gameName, shareData = {}) {
     const parts = [];
     if (score    !== undefined) parts.push(maxScore    !== undefined ? `${score}/${maxScore}`       : String(score));
     if (guesses  !== undefined) parts.push(maxGuesses  !== undefined ? `${guesses}/${maxGuesses} guesses` : `${guesses} guesses`);
-    if (time     !== undefined) parts.push(`⏱ ${time}`);
-    if (won      !== undefined) parts.push(won ? '✓' : '✗');
-    if (parts.length) lines.push(parts.join('  ·  '));
+    if (time     !== undefined) parts.push(`â± ${time}`);
+    if (won      !== undefined) parts.push(won ? 'âœ“' : 'âœ—');
+    if (parts.length) lines.push(parts.join('  Â·  '));
   }
   if (extra) lines.push(extra);
   lines.push('Play at crackd.live');
@@ -45,10 +45,10 @@ export function useShareResult(gameName) {
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text)
     .then(() => toast.success('Copied to clipboard!'))
-    .catch(() => toast.error('Could not copy — please copy manually'));
+    .catch(() => toast.error('Could not copy â€” please copy manually'));
 }
 
-// ── Animated checkmark ─────────────────────────────────────────────────────────
+// â”€â”€ Animated checkmark â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function AnimatedCheck() {
   return (
     <div className="relative w-20 h-20 mx-auto mb-8">
@@ -56,20 +56,20 @@ function AnimatedCheck() {
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background: 'rgba(16,185,129,0.10)',
-          border: '1px solid rgba(16,185,129,0.25)',
+          background: 'rgba(200,245,90,0.08)',
+          border: '1px solid rgba(200,245,90,0.22)',
           animation: 'pulseGlow 2.5s ease-in-out infinite',
         }}
       />
       {/* Inner circle */}
       <div
         className="absolute inset-2 rounded-full flex items-center justify-center"
-        style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.20)' }}
+        style={{ background: 'rgba(200,245,90,0.07)', border: '1px solid rgba(200,245,90,0.18)' }}
       >
         <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
           <polyline
             points="8,20 17,29 32,11"
-            stroke="#10B981"
+            stroke="#C8F55A"
             strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -82,10 +82,10 @@ function AnimatedCheck() {
   );
 }
 
-// ── Loading skeleton ───────────────────────────────────────────────────────────
+// â”€â”€ Loading skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function GameShellSkeleton() {
   return (
-    <div className="min-h-screen flex flex-col items-center pb-24 pt-4" style={{ background: '#080909' }}>
+    <div className="min-h-screen flex flex-col items-center pb-24 pt-4" style={{ background: '#0E0E14' }}>
       <div className="w-full max-w-lg px-4 pb-4 mb-6 flex items-center justify-between"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="skeleton w-8 h-8 rounded-lg" />
@@ -101,7 +101,7 @@ export function GameShellSkeleton() {
   );
 }
 
-// ── Shell ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function GameShell({
   gameId, title, right, badge, children, maxWidth = 'max-w-lg',
   onHint = null, onSolve = null,
@@ -125,10 +125,10 @@ export default function GameShell({
   }, [shareResult, shareData]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center pb-24 pt-4" style={{ background: '#080909' }}>
+    <div className="min-h-screen flex flex-col items-center pb-24 pt-4" style={{ background: '#0E0E14' }}>
       {htp.open && <HowToPlay gameId={gameId} onClose={htp.hide} />}
 
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <div
         className={`w-full ${maxWidth} flex items-center justify-between px-4 pb-4 mb-6`}
         style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
@@ -139,7 +139,7 @@ export default function GameShell({
           className="w-9 h-9 rounded-xl flex items-center justify-center text-muted transition-[color,background-color] duration-150"
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           onMouseEnter={e => { e.currentTarget.style.color = '#FAFAFA'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#7A7A8C'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
         >
           <ArrowLeft size={16} />
         </button>
@@ -165,8 +165,8 @@ export default function GameShell({
               className="w-9 h-9 rounded-xl flex items-center justify-center text-muted transition-[color,border-color] duration-150"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
               title="Share your result"
-              onMouseEnter={e => { e.currentTarget.style.color = '#F0B429'; e.currentTarget.style.borderColor = 'rgba(240,180,41,0.25)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#C8F55A'; e.currentTarget.style.borderColor = 'rgba(200,245,90,0.20)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#7A7A8C'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
             >
               <Share2 size={15} />
             </button>
@@ -176,7 +176,7 @@ export default function GameShell({
             className="w-9 h-9 rounded-xl flex items-center justify-center text-muted transition-[color,border-color] duration-150"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#FAFAFA'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#7A7A8C'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; }}
           >
             <HelpCircle size={15} />
           </button>
@@ -194,7 +194,7 @@ export default function GameShell({
         disabled={gameOver}
       />
 
-      {/* ── Result overlay ── */}
+      {/* â”€â”€ Result overlay â”€â”€ */}
       <AnimatePresence>
         {result && (
           <motion.div
@@ -212,7 +212,7 @@ export default function GameShell({
               transition={{ type: 'spring', stiffness: 320, damping: 28, delay: 0.06 }}
               className="w-full max-w-sm text-center"
               style={{
-                background: '#0F1117',
+                background: '#18181F',
                 border: '1px solid rgba(255,255,255,0.09)',
                 borderRadius: 20,
                 padding: '36px 28px 28px',
@@ -264,7 +264,7 @@ export default function GameShell({
               >
                 {xpEarned > 0 && (
                   <div className="flex items-center justify-between px-4 py-3 rounded-xl"
-                    style={{ background: 'rgba(240,180,41,0.07)', border: '1px solid rgba(240,180,41,0.14)' }}>
+                    style={{ background: 'rgba(200,245,90,0.07)', border: '1px solid rgba(200,245,90,0.14)' }}>
                     <span className="text-sm text-muted font-medium">Earned today</span>
                     <span className="font-black text-amber text-base">+{xpEarned} XP</span>
                   </div>
@@ -282,23 +282,23 @@ export default function GameShell({
                     onClick={handleShare}
                     className="w-full py-3 rounded-xl text-sm font-semibold transition-[border-color,color,background-color] duration-150"
                     style={{
-                      background: copied ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${copied ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.10)'}`,
-                      color: copied ? '#10B981' : '#94A3B8',
+                      background: copied ? 'rgba(200,245,90,0.07)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${copied ? 'rgba(200,245,90,0.22)' : 'rgba(255,255,255,0.10)'}`,
+                      color: copied ? '#C8F55A' : '#7A7A8C',
                     }}
                   >
-                    {copied ? 'Copied! ✓' : 'Share your result'}
+                    {copied ? 'Copied! âœ“' : 'Share your result'}
                   </button>
                 )}
                 <button
                   onClick={() => navigate('/games')}
                   className="w-full py-3.5 rounded-xl text-sm font-black text-inverse transition-opacity duration-150 hover:opacity-90"
                   style={{
-                    background: '#F0B429',
-                    boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 4px 20px rgba(240,180,41,0.20)',
+                    background: '#C8F55A',
+                    boxShadow: '0 0 0 1px rgba(200,245,90,0.25), 0 4px 20px rgba(200,245,90,0.18)',
                   }}
                 >
-                  Next challenge →
+                  Next challenge â†’
                 </button>
               </motion.div>
             </motion.div>

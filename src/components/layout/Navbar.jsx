@@ -12,6 +12,7 @@ import { supabase } from '../../lib/supabase.js';
 const NAV_LINKS = [
   { to: '/games',       label: "Today's Set"  },
   { to: '/leaderboard', label: 'The Board'    },
+  { to: '/profile',     label: 'Your Record'  },
 ];
 
 export default function Navbar() {
@@ -55,7 +56,7 @@ export default function Navbar() {
         animate={{ height: navHeight }}
         transition={{ duration: 0.25, ease: 'easeOut' }}
         style={{
-          background: scrolled ? 'rgba(8,9,9,0.85)' : 'rgba(8,9,9,0)',
+          background: scrolled ? 'rgba(14,14,20,0.88)' : 'rgba(14,14,20,0)',
           backdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'blur(0px)',
           borderBottom: `1px solid ${scrolled ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0)'}`,
           transition: 'background 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease',
@@ -78,15 +79,15 @@ export default function Navbar() {
                   key={link.to}
                   to={link.to}
                   className="relative px-4 py-1.5 rounded-lg text-sm font-semibold transition-[color] duration-150"
-                  style={{ color: active ? '#080909' : '#94A3B8' }}
-                  onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#FAFAFA'; }}
-                  onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#94A3B8'; }}
+                  style={{ color: active ? '#0E0E14' : '#7A7A8C' }}
+                  onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#F0EEE6'; }}
+                  onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#7A7A8C'; }}
                 >
                   {active && (
                     <motion.div
                       layoutId="nav-pill"
                       className="absolute inset-0 rounded-lg"
-                      style={{ background: '#F0B429' }}
+                      style={{ background: '#C8F55A' }}
                       transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                     />
                   )}
@@ -108,17 +109,17 @@ export default function Navbar() {
             {/* Streak pill */}
             {overallStreak > 0 && (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-pill"
-                style={{ background: 'rgba(240,180,41,0.10)', border: '1px solid rgba(240,180,41,0.18)' }}>
-                <Flame size={13} className="text-amber" />
-                <span className="text-xs font-black text-amber tabular-nums">{overallStreak}</span>
+                style={{ background: 'rgba(200,245,90,0.08)', border: '1px solid rgba(200,245,90,0.18)' }}>
+                <Flame size={13} className="text-lime" />
+                <span className="text-xs font-black text-lime tabular-nums">{overallStreak}</span>
               </div>
             )}
 
             {/* XP level pill */}
             {user && (
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-pill"
-                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.15)' }}>
-                <span className="text-xs font-bold text-purple">{level.title}</span>
+                style={{ background: 'rgba(166,124,255,0.08)', border: '1px solid rgba(166,124,255,0.15)' }}>
+                <span className="text-xs font-bold text-violet">{level.title}</span>
               </div>
             )}
 
@@ -148,7 +149,7 @@ export default function Navbar() {
                     className="w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center flex-shrink-0"
                     style={{
                       background: `linear-gradient(135deg, ${level.color}, ${level.color}99)`,
-                      color: '#080909',
+                      color: '#0E0E14',
                     }}
                   >
                     {(profile?.username || user.email)?.[0]?.toUpperCase() || 'U'}
@@ -175,7 +176,7 @@ export default function Navbar() {
                         transition={{ type: 'spring', stiffness: 440, damping: 34 }}
                         className="absolute top-11 right-0 w-64 z-50 overflow-hidden"
                         style={{
-                          background: '#0F1117',
+                          background: '#18181F',
                           border: '1px solid rgba(255,255,255,0.08)',
                           borderRadius: 16,
                           boxShadow: '0 20px 56px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.4)',
@@ -186,7 +187,7 @@ export default function Navbar() {
                           <div className="flex items-center gap-3">
                             <div
                               className="w-10 h-10 rounded-xl font-black text-sm flex items-center justify-center flex-shrink-0"
-                              style={{ background: `linear-gradient(135deg, ${level.color}, ${level.color}80)`, color: '#080909' }}
+                              style={{ background: `linear-gradient(135deg, ${level.color}, ${level.color}80)`, color: '#0E0E14' }}
                             >
                               {(profile?.username || user.email)?.[0]?.toUpperCase()}
                             </div>
@@ -216,7 +217,7 @@ export default function Navbar() {
                                   <div
                                     key={i}
                                     className="flex-1 h-1 rounded-full"
-                                    style={{ background: i < completedCount ? '#F0B429' : 'rgba(255,255,255,0.08)' }}
+                                    style={{ background: i < completedCount ? '#C8F55A' : 'rgba(255,255,255,0.08)' }}
                                   />
                                 ))}
                               </div>
@@ -238,7 +239,7 @@ export default function Navbar() {
                               onClick={() => navigate(to)}
                               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-muted transition-[color,background-color] duration-150"
                               onMouseEnter={e => { e.currentTarget.style.color = '#FAFAFA'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
-                              onMouseLeave={e => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.background = 'transparent'; }}
+                              onMouseLeave={e => { e.currentTarget.style.color = '#7A7A8C'; e.currentTarget.style.background = 'transparent'; }}
                             >
                               <Icon size={15} />
                               {label}
@@ -275,9 +276,9 @@ export default function Navbar() {
                   to="/signup"
                   className="text-sm font-bold px-5 py-2 rounded-btn transition-[opacity,box-shadow] duration-150 hover:opacity-90"
                   style={{
-                    background: '#F0B429',
-                    color: '#080909',
-                    boxShadow: '0 0 20px rgba(240,180,41,0.25)',
+                    background: '#C8F55A',
+                    color: '#0E0E14',
+                    boxShadow: '0 0 20px rgba(200,245,90,0.20)',
                     borderRadius: 10,
                   }}
                 >
@@ -314,7 +315,7 @@ export default function Navbar() {
             className="fixed left-0 right-0 z-40 md:hidden"
             style={{
               top: navHeight,
-              background: 'rgba(8,9,9,0.96)',
+              background: 'rgba(14,14,20,0.96)',
               backdropFilter: 'blur(24px)',
               borderBottom: '1px solid rgba(255,255,255,0.06)',
               boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
@@ -329,8 +330,8 @@ export default function Navbar() {
                     to={link.to}
                     className="flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-[color,background-color] duration-150"
                     style={{
-                      color: active ? '#080909' : '#94A3B8',
-                      background: active ? '#F0B429' : 'transparent',
+                      color: active ? '#0E0E14' : '#7A7A8C',
+                      background: active ? '#C8F55A' : 'transparent',
                     }}
                   >
                     {link.label}
@@ -347,7 +348,7 @@ export default function Navbar() {
                   </Link>
                   <Link to="/signup"
                     className="flex-1 text-center py-2.5 rounded-xl text-sm font-bold"
-                    style={{ background: '#F0B429', color: '#080909', borderRadius: 10 }}>
+                    style={{ background: '#C8F55A', color: '#0E0E14', borderRadius: 10 }}>
                     Play Free
                   </Link>
                 </div>
@@ -358,7 +359,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-2.5">
                     <div
                       className="w-8 h-8 rounded-lg font-black text-xs flex items-center justify-center"
-                      style={{ background: `linear-gradient(135deg, ${level.color}, ${level.color}80)`, color: '#080909' }}
+                      style={{ background: `linear-gradient(135deg, ${level.color}, ${level.color}80)`, color: '#0E0E14' }}
                     >
                       {(profile?.username || user.email)?.[0]?.toUpperCase()}
                     </div>

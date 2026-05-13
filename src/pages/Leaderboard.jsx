@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase.js';
 import { useAuthStore } from '../store/authStore.js';
@@ -23,10 +23,10 @@ function periodStart(period) {
   if (period === 'This Week') {
     return new Date(Date.now() - 7 * 86_400_000).toISOString();
   }
-  return null; // All Time — no filter
+  return null; // All Time â€” no filter
 }
 
-// ─── Skeleton ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SkeletonRow() {
   return (
@@ -43,7 +43,7 @@ function SkeletonRow() {
   );
 }
 
-// ─── Podium ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Podium â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function Podium({ players }) {
   if (!players[0]) return null;
@@ -55,7 +55,7 @@ function Podium({ players }) {
         const isFirst = p.rank === 1;
         const level   = getLevelInfo(p.xp);
         const podiumH = isFirst ? 'h-28' : p.rank === 2 ? 'h-20' : 'h-14';
-        const medal   = ['🥇', '🥈', '🥉'][p.rank - 1];
+        const medal   = ['ðŸ¥‡', 'ðŸ¥ˆ', 'ðŸ¥‰'][p.rank - 1];
 
         return (
           <motion.div
@@ -71,11 +71,11 @@ function Podium({ players }) {
                 width:      isFirst ? 64 : 52,
                 height:     isFirst ? 64 : 52,
                 background: isFirst
-                  ? 'linear-gradient(135deg, #F5A623, #FFD166)'
+                  ? 'linear-gradient(135deg, #C8F55A, #FFD166)'
                   : `linear-gradient(135deg, ${level.color}80, ${level.color}40)`,
                 boxShadow:  isFirst ? '0 0 28px rgba(245,166,35,0.4)' : 'none',
                 fontSize:   isFirst ? 22 : 16,
-                color:      isFirst ? '#0D0F14' : level.color,
+                color:      isFirst ? '#0E0E14' : level.color,
               }}
             >
               {p.username.slice(0, 2).toUpperCase()}
@@ -105,7 +105,7 @@ function Podium({ players }) {
   );
 }
 
-// ─── Row ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function PlayerRow({ player, index, isCurrentUser }) {
   const level = getLevelInfo(player.xp);
@@ -135,7 +135,7 @@ function PlayerRow({ player, index, isCurrentUser }) {
     >
       <span className="w-8 text-center flex-shrink-0">
         {player.rank <= 3
-          ? <span className="text-lg">{['🥇','🥈','🥉'][player.rank - 1]}</span>
+          ? <span className="text-lg">{['ðŸ¥‡','ðŸ¥ˆ','ðŸ¥‰'][player.rank - 1]}</span>
           : <span className="text-sm font-black text-muted/50">#{player.rank}</span>
         }
       </span>
@@ -152,14 +152,14 @@ function PlayerRow({ player, index, isCurrentUser }) {
           <p className="font-bold text-sm text-text truncate">{player.username}</p>
           {isCurrentUser && (
             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-              style={{ color: '#4A9EFF', background: 'rgba(74,158,255,0.12)' }}>You</span>
+              style={{ color: '#A67CFF', background: 'rgba(166,124,255,0.12)' }}>You</span>
           )}
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden sm:block"
             style={{ color: level.color, background: `${level.color}15` }}>{level.title}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted">{player.country}</span>
-          <span className="text-muted/30 text-xs">·</span>
+          <span className="text-muted/30 text-xs">Â·</span>
           <span className="text-xs text-muted flex items-center gap-0.5"><Flame size={10} /> {player.streak}d</span>
         </div>
       </div>
@@ -172,19 +172,19 @@ function PlayerRow({ player, index, isCurrentUser }) {
   );
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function EmptyState({ game, period }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="text-5xl mb-4">🏆</div>
+      <div className="text-5xl mb-4">ðŸ†</div>
       <p className="font-black text-lg text-text mb-2">Nothing here yet.</p>
       <p className="text-sm text-muted">Go earn it.</p>
     </div>
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function LeaderboardPage() {
   const { user }             = useAuthStore();
@@ -224,7 +224,7 @@ export default function LeaderboardPage() {
           avatar:    p.profiles?.avatar_url || null,
           xp:        p.xp                   || 0,
           streak:    p.streak               || 0,
-          country:   p.country              || '🌍',
+          country:   p.country              || 'ðŸŒ',
         }))
       );
     } catch (err) {
@@ -241,9 +241,9 @@ export default function LeaderboardPage() {
       {/* Ambient */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[500px] h-[400px] opacity-[0.06]"
-          style={{ background: 'radial-gradient(ellipse at right top, #F5A623 0%, transparent 65%)' }} />
+          style={{ background: 'radial-gradient(ellipse at right top, #C8F55A 0%, transparent 65%)' }} />
         <div className="absolute bottom-0 left-0 w-[400px] h-[300px] opacity-[0.05]"
-          style={{ background: 'radial-gradient(ellipse at left bottom, #4A9EFF 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(ellipse at left bottom, #A67CFF 0%, transparent 70%)' }} />
       </div>
 
       <div className="max-w-2xl mx-auto px-4 relative z-10">
@@ -298,7 +298,7 @@ export default function LeaderboardPage() {
           ))}
         </div>
 
-        {/* Podium — hidden while loading */}
+        {/* Podium â€” hidden while loading */}
         {!loading && players.length > 0 && (
           <>
             <p className="text-center text-xs font-bold uppercase tracking-widest text-muted/50 mb-6">

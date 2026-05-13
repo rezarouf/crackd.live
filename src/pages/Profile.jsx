@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore.js';
 import { useGameStore } from '../store/gameStore.js';
@@ -144,7 +144,7 @@ export default function ProfilePage() {
             ) : (
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-navy flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #F5A623, #FFD166)', boxShadow: '0 0 24px rgba(245,166,35,0.3)' }}
+                style={{ background: 'linear-gradient(135deg, #C8F55A, #D4FF6B)', boxShadow: '0 0 24px rgba(200,245,90,0.25)' }}
               >
                 {avatarLetter}
               </div>
@@ -199,11 +199,11 @@ export default function ProfilePage() {
 
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-bold" style={{ color: level.color }}>{level.title}</span>
-                <span className="text-muted text-xs">·</span>
+                <span className="text-muted text-xs">Â·</span>
                 <span className="text-muted text-xs font-mono">{formatNumber(xp)} XP</span>
                 {streak > 0 && (
                   <>
-                    <span className="text-muted text-xs">·</span>
+                    <span className="text-muted text-xs">Â·</span>
                     <span className="text-xs text-amber font-semibold flex items-center gap-1"><Flame size={11} /> {streak}d streak</span>
                   </>
                 )}
@@ -216,7 +216,7 @@ export default function ProfilePage() {
               <div className="space-y-1">
                 <div className="flex justify-between text-xs text-muted">
                   <span>{formatNumber(xp)} XP</span>
-                  {nextLevelXp && <span>→ {formatNumber(nextLevelXp)} XP</span>}
+                  {nextLevelXp && <span>â†’ {formatNumber(nextLevelXp)} XP</span>}
                 </div>
                 <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
                   <motion.div
@@ -236,8 +236,8 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <StatCard label="Total XP"        value={formatNumber(xp)}            Icon={Star}       />
           <StatCard label="Current Streak"  value={`${streak}d`}                Icon={Flame}      />
-          <StatCard label="Days Active"     value={gamesPlayed === null ? '…' : formatNumber(gamesPlayed)} Icon={CalendarDays} />
-          <StatCard label="Global Rank"     value="#—"                          Icon={Gamepad2}   />
+          <StatCard label="Days Active"     value={gamesPlayed === null ? 'â€¦' : formatNumber(gamesPlayed)} Icon={CalendarDays} />
+          <StatCard label="Global Rank"     value="#â€”"                          Icon={Gamepad2}   />
         </div>
 
         {/* Tabs */}
@@ -273,7 +273,7 @@ export default function ProfilePage() {
                         ${done ? 'bg-green/8 border-green/25' : 'bg-surface-2 border-white/[0.06]'}`}
                     >
                       <span className="text-xl">{game.icon}</span>
-                      {done && <span className="text-[10px] text-green font-bold">✓</span>}
+                      {done && <span className="text-[10px] text-green font-bold">âœ“</span>}
                     </div>
                   );
                 })}
@@ -281,7 +281,7 @@ export default function ProfilePage() {
               <div className="mt-4">
                 <div className="flex justify-between text-xs text-muted mb-1.5">
                   <span>{daily.completedCount} of {GAMES_META.length} complete</span>
-                  {daily.isFullHouse && <span className="text-amber font-bold">🏠 Full House!</span>}
+                  {daily.isFullHouse && <span className="text-amber font-bold">ðŸ  Full House!</span>}
                 </div>
                 <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
                   <motion.div
@@ -302,7 +302,7 @@ export default function ProfilePage() {
                   const gameStreak = streaks[game.id] || 0;
                   return (
                     <div key={game.id} className="flex items-center gap-3">
-                      <span className="text-base w-7 text-center">{game.icon || '🎮'}</span>
+                      <span className="text-base w-7 text-center">{game.icon || 'ðŸŽ®'}</span>
                       <span className="text-sm text-muted flex-1">{game.name}</span>
                       <div className="flex items-center gap-1">
                         {gameStreak > 0 && <Flame size={11} className="text-amber" />}
@@ -331,13 +331,13 @@ export default function ProfilePage() {
                 const done       = isCompletedToday(game.id);
                 return (
                   <div key={game.id} className="flex items-center gap-3 py-2 border-b border-white/[0.04] last:border-0">
-                    <span className="text-base w-7 text-center">{game.icon || '🎮'}</span>
+                    <span className="text-base w-7 text-center">{game.icon || 'ðŸŽ®'}</span>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-text">{game.name}</p>
                       <p className="text-xs text-muted">{game.type === 'word' ? 'Word & Number' : 'Visual Puzzle'}</p>
                     </div>
                     <div className="text-right">
-                      {done && <p className="text-xs text-green font-bold mb-0.5">✓ Done</p>}
+                      {done && <p className="text-xs text-green font-bold mb-0.5">âœ“ Done</p>}
                       <p className="text-xs text-muted flex items-center gap-1 justify-end">
                         {gameStreak > 0 && <Flame size={10} className="text-amber" />}
                         {gameStreak}d
@@ -375,7 +375,7 @@ export default function ProfilePage() {
                     <p className="text-sm font-bold text-text">{a.name}</p>
                     <p className="text-xs text-muted">{a.desc}</p>
                   </div>
-                  {unlocked && <span className="text-amber text-sm">✓</span>}
+                  {unlocked && <span className="text-amber text-sm">âœ“</span>}
                 </div>
               );
             })}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -35,7 +35,7 @@ function SectionHeader({ label, count }) {
 
 function GameCard({ game, index, done, navigate }) {
   const [hovered, setHovered] = useState(false);
-  const diffColor = DIFF_COLOR[game.difficulty] || '#94A3B8';
+  const diffColor = DIFF_COLOR[game.difficulty] || '#7A7A8C';
   const Icon = GAME_ICONS[game.id];
 
   return (
@@ -53,10 +53,10 @@ function GameCard({ game, index, done, navigate }) {
           : hovered
           ? 'rgba(22,27,37,1)'
           : 'rgba(22,27,37,0.85)',
-        border: `1px solid ${done ? 'rgba(16,185,129,0.20)' : hovered ? 'rgba(240,180,41,0.22)' : 'rgba(255,255,255,0.07)'}`,
+        border: `1px solid ${done ? 'rgba(200,245,90,0.20)' : hovered ? 'rgba(200,245,90,0.18)' : 'rgba(255,255,255,0.07)'}`,
         borderRadius: 16,
         boxShadow: hovered && !done
-          ? '0 0 28px rgba(240,180,41,0.08), 0 8px 32px rgba(0,0,0,0.4)'
+          ? '0 0 28px rgba(200,245,90,0.08), 0 8px 32px rgba(0,0,0,0.4)'
           : done
           ? '0 0 16px rgba(16,185,129,0.06)'
           : '0 2px 16px rgba(0,0,0,0.25)',
@@ -70,7 +70,7 @@ function GameCard({ game, index, done, navigate }) {
         style={{
           background: game.type === 'word'
             ? `linear-gradient(90deg, transparent, ${diffColor}60, transparent)`
-            : `linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent)`,
+            : `linear-gradient(90deg, transparent, rgba(166,124,255,0.4), transparent)`,
           opacity: hovered ? 1 : 0.5,
           transition: 'opacity 0.2s ease',
         }}
@@ -147,7 +147,7 @@ function GameCard({ game, index, done, navigate }) {
               animate={{ opacity: hovered ? 1 : 0, x: hovered ? 0 : 4 }}
               transition={{ duration: 0.15 }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-[11px] font-black"
-              style={{ background: '#F0B429', color: '#080909' }}
+              style={{ background: '#C8F55A', color: '#0E0E14' }}
             >
               Begin
             </motion.div>
@@ -170,12 +170,12 @@ export default function GamesPage() {
   const totalDone   = GAMES_META.filter(g => isCompletedToday(g.id)).length;
 
   return (
-    <div className="min-h-screen pt-16 pb-28 relative overflow-x-hidden" style={{ background: '#080909' }}>
+    <div className="min-h-screen pt-16 pb-28 relative overflow-x-hidden" style={{ background: '#0E0E14' }}>
 
       {/* Ambient */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px]"
-          style={{ background: 'radial-gradient(ellipse, rgba(240,180,41,0.06) 0%, transparent 65%)' }} />
+          style={{ background: 'radial-gradient(ellipse, rgba(200,245,90,0.06) 0%, transparent 65%)' }} />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
@@ -203,12 +203,12 @@ export default function GamesPage() {
                 initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15 }}
                 className="flex items-center gap-4 px-5 py-3.5 rounded-2xl flex-shrink-0"
-                style={{ background: 'rgba(240,180,41,0.06)', border: '1px solid rgba(240,180,41,0.14)' }}
+                style={{ background: 'rgba(200,245,90,0.06)', border: '1px solid rgba(200,245,90,0.14)' }}
               >
                 <div className="flex gap-0.5">
                   {GAMES_META.map(g => (
                     <div key={g.id} className="w-1.5 h-4 rounded-sm"
-                      style={{ background: isCompletedToday(g.id) ? '#F0B429' : 'rgba(255,255,255,0.08)' }} />
+                      style={{ background: isCompletedToday(g.id) ? '#C8F55A' : 'rgba(255,255,255,0.08)' }} />
                   ))}
                 </div>
                 <div className="text-right">
@@ -232,15 +232,15 @@ export default function GamesPage() {
               key={f}
               onClick={() => setFilter(f)}
               className="relative px-5 py-2 rounded-lg text-sm font-semibold transition-[color] duration-150"
-              style={{ color: filter === f ? '#080909' : '#94A3B8' }}
+              style={{ color: filter === f ? '#0E0E14' : '#7A7A8C' }}
               onMouseEnter={e => { if (filter !== f) e.currentTarget.style.color = '#FAFAFA'; }}
-              onMouseLeave={e => { if (filter !== f) e.currentTarget.style.color = '#94A3B8'; }}
+              onMouseLeave={e => { if (filter !== f) e.currentTarget.style.color = '#7A7A8C'; }}
             >
               {filter === f && (
                 <motion.div
                   layoutId="filter-pill"
                   className="absolute inset-0 rounded-lg"
-                  style={{ background: '#F0B429' }}
+                  style={{ background: '#C8F55A' }}
                   transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                 />
               )}

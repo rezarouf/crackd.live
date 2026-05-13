@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/authStore.js';
@@ -35,19 +35,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#080909' }}>
+    <div className="min-h-screen flex" style={{ background: '#0E0E14' }}>
 
-      {/* ── Left brand panel (desktop only) ── */}
+      {/* â”€â”€ Left brand panel (desktop only) â”€â”€ */}
       <div
         className="hidden lg:flex flex-col justify-between w-[42%] flex-shrink-0 p-12 relative overflow-hidden"
         style={{
-          background: 'linear-gradient(160deg, #0F1117 0%, #080909 60%, #0D0810 100%)',
+          background: 'linear-gradient(160deg, #0F1117 0%, #0E0E14 60%, #0D0810 100%)',
           borderRight: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         {/* Ambient glow */}
         <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse, rgba(240,180,41,0.10) 0%, transparent 65%)' }} />
+          style={{ background: 'radial-gradient(ellipse, rgba(200,245,90,0.08) 0%, transparent 65%)' }} />
         <div className="absolute bottom-[-5%] left-[-5%] w-[300px] h-[300px] pointer-events-none"
           style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 65%)' }} />
 
@@ -82,7 +82,7 @@ export default function LoginPage() {
                 className="flex items-center gap-3"
               >
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(240,180,41,0.10)', border: '1px solid rgba(240,180,41,0.20)' }}>
+                  style={{ background: 'rgba(200,245,90,0.08)', border: '1px solid rgba(200,245,90,0.18)' }}>
                   <Icon size={15} className="text-amber" />
                 </div>
                 <span className="text-sm text-muted font-medium">{text}</span>
@@ -93,16 +93,16 @@ export default function LoginPage() {
 
         {/* Bottom */}
         <p className="relative z-10 text-xs text-tertiary">
-          © 2025 Crackd.live · Free forever
+          Â© 2025 Crackd.live Â· Free forever
         </p>
       </div>
 
-      {/* ── Right form panel ── */}
+      {/* â”€â”€ Right form panel â”€â”€ */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
 
         {/* Mobile ambient */}
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[500px] h-[400px] lg:hidden pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse, rgba(240,180,41,0.09) 0%, transparent 65%)' }} />
+          style={{ background: 'radial-gradient(ellipse, rgba(200,245,90,0.07) 0%, transparent 65%)' }} />
         <div className="absolute inset-0 grid-bg opacity-[0.25] pointer-events-none lg:hidden" />
 
         <motion.div
@@ -163,7 +163,7 @@ export default function LoginPage() {
               <label className="block text-xs font-bold text-muted/60 mb-2 uppercase tracking-wider">Password</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••" required autoComplete="current-password"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required autoComplete="current-password"
                 className="input"
               />
             </div>
@@ -172,8 +172,8 @@ export default function LoginPage() {
               type="submit" disabled={loading} whileTap={{ scale: 0.98 }}
               className="w-full py-3.5 rounded-xl font-bold text-inverse text-sm mt-1 transition-opacity duration-150 disabled:opacity-50"
               style={{
-                background: '#F0B429',
-                boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 4px 16px rgba(240,180,41,0.20)',
+                background: '#C8F55A',
+                boxShadow: '0 0 0 1px rgba(240,180,41,0.3), 0 4px 16px rgba(200,245,90,0.18)',
               }}
             >
               {loading ? (
@@ -182,7 +182,7 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
-                  Logging in…
+                  Logging inâ€¦
                 </span>
               ) : 'Log In'}
             </motion.button>
