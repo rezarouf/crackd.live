@@ -33,37 +33,45 @@ export default supabase;
  * Resolves the current user internally — passed userId is a fallback only.
  * Never throws; logs all errors to console.
  */
-export async function saveGameResult(userId, gameType, score, timeSeconds, difficulty, xpEarned, isDaily = false) {
+export async function saveGameResult(userIdOrObj, gameType, score, timeSeconds, difficulty, xpEarned, isDaily = false) {
+  // Support both calling conventions:
+  //   saveGameResult(userId, gameType, score, ...)
+  //   saveGameResult({ userId, gameType, score, ... })
+  let _userId, _gameType, _score, _timeSeconds, _difficulty, _xpEarned, _isDaily;
+  if (userIdOrObj && typeof userIdOrObj === 'object' && !Array.isArray(userIdOrObj)) {
+    ({ userId: _userId, gameType: _gameType, score: _score, timeSeconds: _timeSeconds,
+       difficulty: _difficulty, xpEarned: _xpEarned, isDaily: _isDaily = false } = userIdOrObj);
+  } else {
+    _userId = userIdOrObj; _gameType = gameType; _score = score;
+    _timeSeconds = timeSeconds; _difficulty = difficulty;
+    _xpEarned = xpEarned; _isDaily = isDaily;
+  }
+
   try {
     // ── Resolve current user ────────────────────────────────────────────────
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError) {
-      console.error('[saveGameResult] auth.getUser() failed:', userError.message);
-    }
-    const uid = user?.id || userId;
+    const { data: { user } } = await supabase.auth.getUser();
+    const uid = user?.id || _userId || null;
     if (!uid) {
       console.error('[saveGameResult] No user ID available — aborting save.');
-      return { data: null, error: new Error('No user ID') };
+      return { success: false, error: new Error('No user ID') };
     }
 
     // ── 1. Insert game_results ──────────────────────────────────────────────
-    const { data: resultData, error: resultError } = await supabase
+    const { error: resultError } = await supabase
       .from('game_results')
       .insert({
         user_id:      uid,
-        game_type:    gameType,
-        difficulty:   difficulty ?? 'normal',
-        score:        score ?? 0,
-        time_seconds: timeSeconds ?? 0,
-        xp_earned:    xpEarned ?? 0,
+        game_type:    _gameType,
+        difficulty:   _difficulty || 'medium',
+        score:        _score || 0,
+        time_seconds: _timeSeconds || 0,
+        xp_earned:    _xpEarned || 0,
         completed:    true,
-        is_daily:     isDaily,
+        is_daily:     _isDaily || false,
         created_at:   new Date().toISOString(),
       });
     if (resultError) {
       console.error('[saveGameResult] game_results insert failed:', resultError.message, resultError);
-    } else {
-      console.log('[saveGameResult] game_results saved OK');
     }
 
     // ── 2. Upsert leaderboard_entries ───────────────────────────────────────
@@ -72,18 +80,16 @@ export async function saveGameResult(userId, gameType, score, timeSeconds, diffi
       .upsert(
         {
           user_id:    uid,
-          game_type:  gameType,
+          game_type:  _gameType,
           period:     'all_time',
-          score:      score ?? 0,
-          xp:         xpEarned ?? 0,
+          score:      _score || 0,
+          xp:         _xpEarned || 0,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: 'user_id,game_type,period', ignoreDuplicates: false }
+        { onConflict: 'user_id, game_type, period', ignoreDuplicates: false }
       );
     if (lbError) {
       console.error('[saveGameResult] leaderboard_entries upsert failed:', lbError.message, lbError);
-    } else {
-      console.log('[saveGameResult] leaderboard_entries upserted OK');
     }
 
     // ── 3. Update profiles (xp + games_played) ──────────────────────────────
@@ -98,21 +104,19 @@ export async function saveGameResult(userId, gameType, score, timeSeconds, diffi
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          xp:           (profile.xp || 0) + (xpEarned ?? 0),
+          xp:           (profile.xp || 0) + (_xpEarned || 0),
           games_played: (profile.games_played || 0) + 1,
         })
         .eq('id', uid);
       if (profileError) {
         console.error('[saveGameResult] profiles update failed:', profileError.message, profileError);
-      } else {
-        console.log('[saveGameResult] profiles updated OK');
       }
     }
 
-    return { data: resultData, error: resultError };
+    return { success: true };
   } catch (err) {
     console.error('[saveGameResult] Unexpected error:', err);
-    return { data: null, error: err };
+    return { success: false, error: err };
   }
 }
 
