@@ -73,7 +73,9 @@ export function useWordle({ mode = 'normal', daily = true }) {
   const [time, setTime]             = useState(0);
   const [hintsUsed, setHintsUsed]   = useState(() => saved?.hintsUsed ?? 0);
   const [wasSolved, setWasSolved]   = useState(() => saved?.wasSolved ?? false);
+  const [checking, setChecking]     = useState(false);
   const timerRef = useRef(null);
+  const validationCache = useRef(new Map());
 
   const { markComplete, isCompletedToday, submitResult } = useGameStore();
   const { user } = useAuthStore();
@@ -110,6 +112,30 @@ export function useWordle({ mode = 'normal', daily = true }) {
     });
   });
 
+  const isValidGuess = useCallback(async (word) => {
+    // Local set covers answer words — always accept them instantly
+    if (wordSetRef.current.has(word)) return true;
+    // Also accept any 5-letter word found in local ANSWER_WORDS fallback
+    if (LOCAL_WORD_SET.has(word)) return true;
+    // Check cache to avoid duplicate API calls
+    if (validationCache.current.has(word)) return validationCache.current.get(word);
+    // Free Dictionary API — fail open on error or timeout
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      const valid = res.ok || res.status !== 404;
+      validationCache.current.set(word, valid);
+      return valid;
+    } catch {
+      return true; // fail open on network error or timeout
+    }
+  }, []);
+
   function finishGame(isWin, rowIdx, hints = hintsUsed, solved = wasSolved) {
     clearInterval(timerRef.current);
     setGameOver(true);
@@ -135,8 +161,8 @@ export function useWordle({ mode = 'normal', daily = true }) {
     if (!isWin) toast.error(`The word was ${target.current}`);
   }
 
-  const handleKey = useCallback((key) => {
-    if (gameOver) return;
+  const handleKey = useCallback(async (key) => {
+    if (gameOver || checking) return;
     const k = key.toUpperCase();
     if (k === 'BACKSPACE' || k === '⌫') {
       setCurrentInput(prev => {
@@ -151,7 +177,15 @@ export function useWordle({ mode = 'normal', daily = true }) {
     if (k === 'ENTER') {
       if (currentInput.some(l => l === null)) { setShake(true); setTimeout(() => setShake(false), 400); toast.error('Not enough letters'); return; }
       const guess = currentInput.join('');
-      if (!wordSetRef.current.has(guess)) { setShake(true); setTimeout(() => setShake(false), 400); toast.error('Not in word list'); return; }
+      // Validate against local set first; fall back to Free Dictionary API
+      const inLocal = wordSetRef.current.has(guess) || LOCAL_WORD_SET.has(guess);
+      if (!inLocal) {
+        setChecking(true);
+        toast('Checking...', { id: 'checking' });
+        const valid = await isValidGuess(guess);
+        setChecking(false);
+        if (!valid) { setShake(true); setTimeout(() => setShake(false), 400); toast.error('Not in word list'); return; }
+      }
       if (mode !== 'normal') {
         // Collect constraints from all previous rows
         const greenConstraints = {}; // position → letter
@@ -195,7 +229,7 @@ export function useWordle({ mode = 'normal', daily = true }) {
         return next;
       });
     }
-  }, [gameOver, currentInput, hintedPositions, currentRow, rows, wordLen, mode, daily, time, hintsUsed, wasSolved]);
+  }, [gameOver, checking, currentInput, hintedPositions, currentRow, rows, wordLen, mode, daily, time, hintsUsed, wasSolved, isValidGuess]);
 
   useEffect(() => {
     const handler = (e) => { if (e.ctrlKey || e.metaKey || e.altKey) return; handleKey(e.key); };
@@ -265,6 +299,6 @@ export function useWordle({ mode = 'normal', daily = true }) {
     time: formatTime(time), letterStates, target: target.current,
     handleKey, getTileState, getTileLetter, newGame, shareResult,
     wordLen, MAX_GUESSES, hintsUsed, wasSolved, hint, solve, isRestored,
-    loading,
+    loading, checking,
   };
 }
