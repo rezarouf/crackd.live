@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { useZenDrive } from './useZenDrive.js';
 
 function SmoothnessMeter({ value }) {
@@ -36,7 +35,7 @@ function StatPill({ label, value, color = '#F0EEE6' }) {
   );
 }
 
-export function ZenDriveGame() {
+export default function ZenDriveGame() {
   const { canvasRef, phase, stats, dailyBest, start, end, share, smoothnessRating, touchRef, CANVAS_W, CANVAS_H } = useZenDrive();
 
   // Touch controls
