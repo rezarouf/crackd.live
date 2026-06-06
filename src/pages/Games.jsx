@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Type, Grid3X3, Hash, Lock, Grid, Settings2, MapPin, GitBranch,
   Layers, Wrench, AlignLeft, LayoutGrid, ArrowUpDown, Workflow,
-  Droplets, Cpu, Bomb, GitMerge, MessageCircle, Gamepad2, Tag,
+  Droplets, Cpu, Bomb, GitMerge, MessageCircle, Gamepad2, Tag, Car,
 } from 'lucide-react';
 import { GAMES_META, DIFF_COLOR } from '../lib/constants.js';
 import { useGameStore } from '../store/gameStore.js';
@@ -17,10 +17,11 @@ const GAME_ICONS = {
   watersort: Droplets, tilerotation: Cpu, minesweeper: Bomb,
   merge: GitMerge, emojiphrase: MessageCircle, twentyfortyeight: Gamepad2,
   logoguess: Tag,
+  zendrive: Car,
 };
 
 const DIFF_LABELS = { Easy: 'Easy', Medium: 'Med', Hard: 'Hard', Expert: 'Expert' };
-const FILTERS = ['All', 'Mental Agility', 'Pattern Recognition'];
+const FILTERS = ['All', 'Mental Agility', 'Stress Busters', 'Pattern Recognition'];
 
 function SectionHeader({ label, count }) {
   return (
@@ -164,9 +165,11 @@ export default function GamesPage() {
   const { isCompletedToday } = useGameStore();
 
   const wordGames   = GAMES_META.filter(g => g.type === 'word');
+  const stressGames = GAMES_META.filter(g => g.type === 'stress');
   const visualGames = GAMES_META.filter(g => g.type === 'visual');
-  const showWord    = filter !== 'Pattern Recognition';
-  const showVisual  = filter !== 'Mental Agility';
+  const showWord    = filter === 'All' || filter === 'Mental Agility';
+  const showStress  = filter === 'All' || filter === 'Stress Busters';
+  const showVisual  = filter === 'All' || filter === 'Pattern Recognition';
   const totalDone   = GAMES_META.filter(g => isCompletedToday(g.id)).length;
 
   return (
@@ -258,6 +261,22 @@ export default function GamesPage() {
               <SectionHeader label="Mental Agility" count={wordGames.length} />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 {wordGames.map((g, i) => (
+                  <GameCard key={g.id} game={g} index={i} done={isCompletedToday(g.id)} navigate={navigate} />
+                ))}
+              </div>
+            </motion.section>
+          )}
+        </AnimatePresence>
+
+        {/* Stress Busters */}
+        <AnimatePresence mode="wait">
+          {showStress && stressGames.length > 0 && (
+            <motion.section key="stress"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="mb-16">
+              <SectionHeader label="Stress Busters" count={stressGames.length} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                {stressGames.map((g, i) => (
                   <GameCard key={g.id} game={g} index={i} done={isCompletedToday(g.id)} navigate={navigate} />
                 ))}
               </div>

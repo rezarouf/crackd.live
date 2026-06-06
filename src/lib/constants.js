@@ -28,6 +28,7 @@ export const XP_BASE = {
   merge:            110,
   emojiphrase:       80,
   twentyfortyeight: 160,
+  zendrive:          80,
 };
 
 export const STREAK_BONUSES = [
@@ -75,7 +76,9 @@ export const GAMES_META = [
   { id: 'merge',            name: 'Merge Tiles',     icon: '🔷', type: 'visual', route: '/games/merge',            xp: 110, difficulty: 'Medium', desc: 'Double it. Keep going.' },
   { id: 'emojiphrase',      name: 'Emoji Phrase',    icon: '🤔', type: 'word',   route: '/games/emojiphrase',      xp:  80, difficulty: 'Easy',   desc: 'Read between the emojis.' },
   { id: 'twentyfortyeight', name: '2048',            icon: '🎯', type: 'visual', route: '/games/2048',             xp: 160, difficulty: 'Expert', desc: 'Merge until you can\'t.' },
-  { id: 'logoguess',        name: 'Logo Rush',       icon: '🏷️', type: 'visual', route: '/games/logoguess',        xp: 100, difficulty: 'Medium', desc: 'How many do you know?' },
+  { id: 'logoguess',        name: 'Logo Rush',       icon: '🏷️', type: 'visual',  route: '/games/logoguess',        xp: 100, difficulty: 'Medium', desc: 'How many do you know?' },
+  // ── Stress Busters ────────────────────────────────────────────────────────
+  { id: 'zendrive',         name: 'Zen Drive',       icon: '🚗', type: 'stress',  route: '/games/zendrive',         xp:  80, difficulty: 'Easy',   desc: 'Smooth highway. Clear your head.' },
 ];
 
 export const FULL_HOUSE_BONUS = 500;

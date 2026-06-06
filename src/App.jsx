@@ -38,6 +38,7 @@ const MergeGame       = lazy(() => import('./games/merge/MergeGame.jsx'));
 const EmojiPhraseGame = lazy(() => import('./games/emojiphrase/EmojiPhraseGame.jsx'));
 const Game2048        = lazy(() => import('./games/twentyfortyeight/Game2048.jsx'));
 const LogoGuessGame   = lazy(() => import('./games/logoguess/LogoGuessGame.jsx'));
+const ZenDriveGame    = lazy(() => import('./games/zendrive/ZenDriveGame.jsx'));
 
 // ─── Loading skeleton shown while a lazy game chunk is fetching ──────────────
 function GameSkeleton() {
@@ -89,6 +90,7 @@ const GAME_ROUTES = [
   { path: '/games/emojiphrase',  element: <EmojiPhraseGame /> },
   { path: '/games/2048',         element: <Game2048 /> },
   { path: '/games/logoguess',    element: <LogoGuessGame /> },
+  { path: '/games/zendrive',    element: <ZenDriveGame /> },
 ];
 
 // ─── App ─────────────────────────────────────────────────────────────────────
@@ -125,6 +127,7 @@ function AppInner() {
       '/games/emojiphrase':  'Emoji Phrase — Crackd.live',
       '/games/2048':         '2048 — Crackd.live',
       '/games/logoguess':    'Logo Rush — Crackd.live',
+      '/games/zendrive':     'Zen Drive — Crackd.live',
     };
     document.title = TITLES[location.pathname] ?? 'Crackd.live';
   }, [location.pathname]);
